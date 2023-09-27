@@ -1,4 +1,4 @@
-// library tvdb;
+// library tmdb;
 
 // import 'dart:convert';
 
@@ -7,21 +7,23 @@
 // import 'package:plex_extractor_app/models/tv_show.dart';
 // import 'package:plex_extractor_app/models/tvdb/tvdb_movie.dart';
 // import 'package:plex_extractor_app/models/tvdb/tvdb_tv_show.dart';
-// part 'tvdb_api.dart';
+// part 'tmdb_api.dart';
 
-// class TvdbRepository {
-//   final tvdb = _TvdbApi();
+// class TmdbRepository {
+//   final tvdb = _TmdbApi();
 
 //   Future<List<TvdbMovie>> getMovies(List<Movie> movies) async {
 //     List<TvdbMovie> tvdbMovies = [];
 //     for (final movie in movies) {
 //       final response = await tvdb.getMovie(movie);
 //       if (response != null) {
+//         print(response["poster_path"]);
 //         tvdbMovies.add(
 //           TvdbMovie(
-//             name: response["name"],
-//             artworkPath: response["image"],
-//             year: response["year"],
+//             name: response["title"],
+//             artworkPath:
+//                 "https://image.tmdb.org/t/p/w500/${response["poster_path"]}",
+//             year: movie.year,
 //             runTime: Duration(minutes: response["runtime"]),
 //           ),
 //         );

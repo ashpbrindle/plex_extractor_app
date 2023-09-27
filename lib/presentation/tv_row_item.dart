@@ -1,22 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:plex_extractor_app/models/movie.dart';
+import 'package:plex_extractor_app/models/tv_show.dart';
 
-class MovieRowItem extends StatelessWidget {
-  const MovieRowItem({
+class TvRowItem extends StatelessWidget {
+  const TvRowItem({
     super.key,
-    required this.movie,
+    required this.tvShow,
   });
 
-  final Movie movie;
+  final TvShow tvShow;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (movie.artworkPath != null)
+        if (tvShow.artworkPath != null)
           CachedNetworkImage(
-            imageUrl: movie.artworkPath!,
+            imageUrl: tvShow.artworkPath!,
             placeholder: (context, url) => const CircularProgressIndicator(),
             errorWidget: (context, url, error) => const Icon(Icons.error),
             width: 75,
@@ -28,13 +28,22 @@ class MovieRowItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                movie.name,
+                tvShow.name,
                 style: style.copyWith(fontWeight: FontWeight.bold),
               ),
-              Text(
-                movie.year,
-                style: style,
-              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: tvShow.seasons!
+                      .map(
+                        (e) => Column(children: [
+                          Text(e.name),
+                          ...e.episodes.map((e) => Text(e.name)).toList(),
+                        ]),
+                      )
+                      .toList(),
+                ),
+              )
             ],
           ),
         ),

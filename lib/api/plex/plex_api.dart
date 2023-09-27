@@ -2,10 +2,10 @@ part of plex;
 
 class _PlexApi {
   static const plexToken = "4uMqH75fXVvnEQ_yJZ6A";
-  static const ipAddress = "mediaserver.local";
+  // static const ipAddress = "127.0.0.1";
 
   /// Returns a map of id's and their paths
-  Future<Map<String, String>> get libraries async {
+  Future<Map<String, String>> getLibraries(String ipAddress) async {
     //http://[IP address]:32400/library/sections/?X-Plex-Token=[PlexToken]
     Map<String, String> libraries = {};
     final url = Uri.parse(
@@ -14,104 +14,137 @@ class _PlexApi {
     final document = XmlDocument.parse(response.body);
     // print(document);
     final directories = document.findAllElements('Directory');
-    for (final _ in directories) {
-      final locations = document.findAllElements('Location');
-      for (final location in locations) {
-        final id = location.attributes.first.value;
-        final value = location.attributes[1].value;
-        if (!libraries.keys.contains(id)) {
-          libraries.putIfAbsent(id, () => value);
-        }
+    for (final directory in directories) {
+      final key = directory.attributes
+          .firstWhere((p0) => p0.name.local.contains("key"))
+          .value;
+      final value = directory.attributes
+          .firstWhere((p0) => p0.name.local.contains("title"))
+          .value;
+      if (!libraries.keys.contains(key)) {
+        libraries.putIfAbsent(key, () => value);
       }
     }
     print(libraries);
     return libraries;
   }
 
-  Future<List<String>> getMovies(
-    String libraryId,
-    String path, {
-    String? filter,
-  }) async {
+  Future<List<Map<String, String>>> getMovies(
+      String libraryId, String ipAddress) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
-    List<String> movies = [];
+    List<Map<String, String>> movies = [];
     final url = Uri.parse(
-      'http://$ipAddress:32400/library/sections/$libraryId/all?X-Plex-Token=$plexToken&${filter ?? ""}',
+      'http://$ipAddress:32400/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
-    final medias = document.findAllElements('Media');
-    for (final _ in medias) {
-      final parts = document.findAllElements('Part');
-      for (final part in parts) {
-        final file = part.attributes
-            .firstWhere(
-              (attribute) => attribute.name.toString().contains("file"),
-            )
-            .value
-            .replaceAll(".mp4", "")
-            .replaceAll(".mkv", "")
-            .split("/")
-            .last;
-        if (file.isNotEmpty && !movies.contains(file)) {
-          print(file);
-          movies.add(file);
-        }
-      }
+    final videos = document.findAllElements('Video');
+    for (var video in videos) {
+      var thumb = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("thumb"))
+          .value;
+      var title = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("title"))
+          .value;
+      var year = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("year"))
+          .value;
+      movies.add({
+        "thumb": "http://$ipAddress:32400$thumb?X-Plex-Token=$plexToken",
+        "title": title,
+        "year": year,
+      });
     }
     return movies;
   }
 
-  Future<Map<String, String>> getTvShows(
-    String libraryId,
-    String path, {
-    String? filter,
-  }) async {
-    // http: //[IP address]:32400/library/metadata/[TV Show ID]]/children?X-Plex-Token=[PlexToken]
-    Map<String, String> tvShows = {};
+  Future<List<TvShow>> getTvShows(String libraryId, String ipAddress) async {
+    // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
+    List<TvShow> tvShows = [];
     final url = Uri.parse(
-      'http://$ipAddress:32400/library/sections/$libraryId/all?X-Plex-Token=$plexToken&${filter ?? ""}',
+      'http://$ipAddress:32400/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
     final directories = document.findAllElements('Directory');
-    for (final directory in directories) {
-      final id = directory.attributes
+    for (var directory in directories) {
+      final ratingKey = directory.attributes
           .firstWhere(
             (attribute) => attribute.name.toString().contains("ratingKey"),
           )
           .value;
-      final value = directory.attributes
+      final title = directory.attributes
           .firstWhere(
             (attribute) => attribute.name.toString().contains("title"),
           )
           .value;
-      if (!tvShows.keys.contains(id)) {
-        tvShows.putIfAbsent(id, () => value);
-      }
+      tvShows.add(
+        TvShow(
+          name: title,
+          seasons: await _getTvShowSeasons(ratingKey, ipAddress),
+        ),
+      );
     }
     return tvShows;
   }
 
-  Future<List<String>> getTvShowSeasons(
+  Future<List<TvShowSeason>> _getTvShowSeasons(
     String id,
+    String ip,
   ) async {
-    // http://[IP address]:32400/library/metadata/[TV Show ID]]/children?X-Plex-Token=[PlexToken]
-    List<String> seasons = [];
+    List<TvShowSeason> seasons = [];
     final url = Uri.parse(
-      'http://$ipAddress:32400/library/metadata/$id/children?X-Plex-Token=$plexToken',
+      'http://$ip:32400/library/metadata/$id/children?X-Plex-Token=$plexToken',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
     final directories = document.findAllElements('Directory');
     for (final directory in directories) {
-      final season = directory.attributes
+      final name = directory.attributes
           .firstWhere(
             (attribute) => attribute.name.toString().contains("title"),
           )
           .value;
-      seasons.add(season);
+      final ratingKey = directory.attributes
+          .firstWhere(
+            (attribute) => attribute.name.toString().contains("ratingKey"),
+          )
+          .value;
+      seasons.add(
+        TvShowSeason(
+          name: name,
+          episodes: await _getTvShowEpisodes(ratingKey, ip),
+        ),
+      );
     }
     return seasons;
+  }
+
+  Future<List<TvShowEpisode>> _getTvShowEpisodes(
+    String id,
+    String ip,
+  ) async {
+    List<TvShowEpisode> episodes = [];
+    final url = Uri.parse(
+      'http://$ip:32400/library/metadata/$id/children?X-Plex-Token=$plexToken',
+    );
+    final response = await http.get(url);
+    final document = XmlDocument.parse(response.body);
+    final videos = document.findAllElements('Video');
+    for (var video in videos) {
+      var thumb = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("thumb"))
+          .value;
+      var title = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("title"))
+          .value;
+      episodes.add(
+        TvShowEpisode(
+          name: title,
+          artworkPath: "http://$ip:32400$thumb?X-Plex-Token=$plexToken",
+        ),
+      );
+    }
+    return episodes;
   }
 }

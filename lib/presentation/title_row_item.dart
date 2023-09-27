@@ -16,7 +16,7 @@ class TitleRowItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Movies",
+            title,
             style: style.copyWith(color: Colors.white),
           ),
         ],

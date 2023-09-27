@@ -1,9 +1,9 @@
 abstract class Media {
   final String name;
-  final String? tvdb;
+  final String? artworkPath;
 
   Media({
     required this.name,
-    this.tvdb,
+    this.artworkPath,
   });
 }

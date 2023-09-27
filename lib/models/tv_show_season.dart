@@ -1,8 +1,10 @@
 part of tv_show;
 
 class TvShowSeason extends Media {
+  List<TvShowEpisode> episodes;
   TvShowSeason({
     required super.name,
-    super.tvdb,
+    required this.episodes,
+    super.artworkPath,
   });
 }

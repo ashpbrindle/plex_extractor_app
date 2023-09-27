@@ -11,22 +11,22 @@ class PlexRepository {
   final plex = _PlexApi();
   Map<String, String> libraries = {};
 
-  Future<void> init() async {
-    libraries = await plex.libraries;
-  }
-
-  Future<List<Movie>> extractMovies() async {
-    if (libraries.isEmpty) await init();
+  Future<List<Movie>> extractMovies(String ip) async {
+    if (libraries.isEmpty) libraries = await plex.getLibraries(ip);
     List<Movie> movies = [];
-    final key = libraries.keys.firstWhere(
-      (key) => libraries[key]!.contains("movie"),
+    final libraryId = libraries.keys.firstWhere(
+      (key) => (libraries[key]!.toLowerCase().contains("movie") ||
+          libraries[key]!.toLowerCase().contains("film")),
     );
-    final path = libraries[key];
+    final path = libraries[libraryId];
     if (path != null) {
       print("Extracting $path...");
-      movies = (await plex.getMovies(key, path))
-          .map((movieName) => Movie(
-                name: movieName,
+      var tempMovies = (await plex.getMovies(libraryId, ip));
+      movies = tempMovies
+          .map((movie) => Movie(
+                name: movie["title"] ?? "",
+                year: movie["year"] ?? "",
+                artworkPath: movie["thumb"],
               ))
           .toList();
       print("Found ${movies.length} Movies!");
@@ -37,37 +37,21 @@ class PlexRepository {
     return movies;
   }
 
-  Future<List<TvShow>> extractTvShows() async {
-    if (libraries.isEmpty) await init();
-    Map<String, String> shows = {};
-    for (final key in libraries.keys.where(
-      (key) => libraries[key]!.contains("tv"),
-    )) {
-      final path = libraries[key];
-      if (path != null) {
-        print("Extracting $path...");
-        shows = await plex.getTvShows(key, path);
-        print("Found ${shows.length} TV Shows!");
-      } else {
-        print("Path name \"$path\" is Invalid, skipping...");
-      }
-    }
-    return extractTvShowsSeasons(shows);
-  }
-
-  Future<List<TvShow>> extractTvShowsSeasons(Map<String, String> shows) async {
-    Map<String, List<String>> extractedTvShows = {};
-    for (final showId in shows.keys) {
-      final showTitle = shows[showId];
-      print("Extracting Seasons for $showTitle...");
-      final seasons = await plex.getTvShowSeasons(showId);
-      print("Found ${seasons.length} seasons for $showTitle...");
-      extractedTvShows.putIfAbsent(showTitle ?? "Unknown", () => seasons);
-    }
+  Future<List<TvShow>> extractTvShows(String ip) async {
+    if (libraries.isEmpty) libraries = await plex.getLibraries(ip);
     List<TvShow> tvShows = [];
-    extractedTvShows.entries.map((entry) => TvShow(
-          name: entry.key,
-        ));
+    final libraryId = libraries.keys.firstWhere(
+      (key) => (libraries[key]!.toLowerCase().contains("tv")),
+    );
+    final path = libraries[libraryId];
+    if (path != null) {
+      print("Extracting $path...");
+      var movies = (await plex.getTvShows(libraryId, ip));
+      print("Found ${tvShows.length} Tv Shows!");
+      return movies;
+    } else {
+      print("Path name \"$path\" is Invalid, skipping...");
+    }
 
     return tvShows;
   }
