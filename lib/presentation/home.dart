@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:plex_extractor_app/presentation/movie_row_item.dart';
-import 'package:plex_extractor_app/presentation/title_row_item.dart';
 import 'package:plex_extractor_app/presentation/tv_row_item.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({
@@ -21,7 +21,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    controller.text = "127.0.0.1";
+    SharedPreferences.getInstance().then((prefs) {
+      final recentIp = prefs.getString("recentIp");
+      controller.text = recentIp ?? "localhost";
+    });
   }
 
   @override
@@ -48,38 +51,37 @@ class _HomeState extends State<Home> {
                         onPressed: () {
                           context
                               .read<PlexCubit>()
-                              .retrieveMovies(controller.text);
+                              .extractMedia(controller.text);
                         },
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.white),
                         ),
-                        child: state.status == PlexStatus.loading
-                            ? const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(),
-                              )
-                            : const Text(
-                                "Load Media from TVDB",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
+                        child: Text(
+                          state.status.getStatus(),
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
                       if (state.movies.isNotEmpty)
-                        const TitleRowItem(title: "Movies"),
-                      ...state.movies
-                          .map(
-                            (e) => MovieRowItem(movie: e),
-                          )
-                          .toList(),
+                        ExpansionTile(
+                          title: const Text("Movies"),
+                          children: state.movies
+                              .map(
+                                (e) => MovieRowItem(movie: e),
+                              )
+                              .toList(),
+                        ),
                       if (state.tvShow.isNotEmpty)
-                        const TitleRowItem(title: "Tv Shows"),
-                      ...state.tvShow
-                          .map(
-                            (e) => TvRowItem(tvShow: e),
-                          )
-                          .toList(),
+                        ExpansionTile(
+                          title: const Text("Tv Shows"),
+                          children: state.tvShow
+                              .map(
+                                (e) => TvRowItem(tvShow: e),
+                              )
+                              .toList(),
+                        ),
                     ],
                   ),
                 );

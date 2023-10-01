@@ -2,7 +2,6 @@ part of plex;
 
 class _PlexApi {
   static const plexToken = "4uMqH75fXVvnEQ_yJZ6A";
-  // static const ipAddress = "127.0.0.1";
 
   /// Returns a map of id's and their paths
   Future<Map<String, String>> getLibraries(String ipAddress) async {
@@ -100,22 +99,26 @@ class _PlexApi {
     final document = XmlDocument.parse(response.body);
     final directories = document.findAllElements('Directory');
     for (final directory in directories) {
-      final name = directory.attributes
-          .firstWhere(
-            (attribute) => attribute.name.toString().contains("title"),
-          )
-          .value;
-      final ratingKey = directory.attributes
-          .firstWhere(
-            (attribute) => attribute.name.toString().contains("ratingKey"),
-          )
-          .value;
-      seasons.add(
-        TvShowSeason(
-          name: name,
-          episodes: await _getTvShowEpisodes(ratingKey, ip),
-        ),
-      );
+      try {
+        final name = directory.attributes
+            .firstWhere(
+              (attribute) => attribute.name.toString().contains("title"),
+            )
+            .value;
+        final ratingKey = directory.attributes
+            .firstWhere(
+              (attribute) => attribute.name.toString().contains("ratingKey"),
+            )
+            .value;
+        seasons.add(
+          TvShowSeason(
+            name: name,
+            episodes: await _getTvShowEpisodes(ratingKey, ip),
+          ),
+        );
+      } catch (e) {
+        print("Invalid Tv Show, Skipping...");
+      }
     }
     return seasons;
   }

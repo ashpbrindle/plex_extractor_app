@@ -5,4 +5,14 @@ class TvShowEpisode extends Media {
     required super.name,
     required super.artworkPath,
   });
+
+  factory TvShowEpisode.fromJson(Map<String, dynamic> json) => TvShowEpisode(
+        name: json["name"],
+        artworkPath: json["path"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "name": name,
+        "path": artworkPath,
+      };
 }
