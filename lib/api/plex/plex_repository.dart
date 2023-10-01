@@ -21,14 +21,7 @@ class PlexRepository {
     final path = libraries[libraryId];
     if (path != null) {
       print("Extracting $path...");
-      var tempMovies = (await plex.getMovies(libraryId, ip));
-      movies = tempMovies
-          .map((movie) => Movie(
-                name: movie["title"] ?? "",
-                year: movie["year"] ?? "",
-                artworkPath: movie["thumb"],
-              ))
-          .toList();
+      movies = (await plex.getMovies(libraryId, ip));
       print("Found ${movies.length} Movies!");
     } else {
       print("Path name \"$path\" is Invalid, skipping...");

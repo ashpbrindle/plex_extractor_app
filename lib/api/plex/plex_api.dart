@@ -28,10 +28,9 @@ class _PlexApi {
     return libraries;
   }
 
-  Future<List<Map<String, String>>> getMovies(
-      String libraryId, String ipAddress) async {
+  Future<List<Movie>> getMovies(String libraryId, String ipAddress) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
-    List<Map<String, String>> movies = [];
+    List<Movie> movies = [];
     final url = Uri.parse(
       'http://$ipAddress:32400/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
     );
@@ -42,17 +41,22 @@ class _PlexApi {
       var thumb = video.attributes
           .firstWhere((p0) => p0.name.local.contains("thumb"))
           .value;
+      var art = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("thumb"))
+          .value;
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
           .value;
       var year = video.attributes
           .firstWhere((p0) => p0.name.local.contains("year"))
           .value;
-      movies.add({
-        "thumb": "http://$ipAddress:32400$thumb?X-Plex-Token=$plexToken",
-        "title": title,
-        "year": year,
-      });
+      movies.add(
+        Movie(
+          name: title,
+          year: year,
+          artworkPath: "http://$ipAddress:32400$art?X-Plex-Token=$plexToken",
+        ),
+      );
     }
     return movies;
   }

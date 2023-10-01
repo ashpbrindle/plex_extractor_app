@@ -14,26 +14,33 @@ class MovieRowItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (movie.artworkPath != null)
-          CachedNetworkImage(
-            imageUrl: movie.artworkPath!,
-            placeholder: (context, url) => const CircularProgressIndicator(),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-            width: 75,
-            height: 120,
-          ),
+        // if (movie.artworkPath != null)
+        // CachedNetworkImage(
+        //   imageUrl: movie.artworkPath!,
+        //   placeholder: (context, url) =>
+        //       const Center(child: CircularProgressIndicator()),
+        //   errorWidget: (context, url, error) => const Icon(Icons.error),
+        //   width: 75,
+        //   height: 120,
+        // ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                movie.name,
-                style: style.copyWith(fontWeight: FontWeight.bold),
+              SizedBox(
+                width: MediaQuery.of(context).size.width / 1.5,
+                child: Text(
+                  movie.name,
+                  style: style.copyWith(fontWeight: FontWeight.bold),
+                ),
               ),
-              Text(
-                movie.year,
-                style: style,
+              SizedBox(
+                width: MediaQuery.of(context).size.width / 1.5,
+                child: Text(
+                  movie.year,
+                  style: style,
+                ),
               ),
             ],
           ),

@@ -24,9 +24,12 @@ class TvRowItem extends StatelessWidget {
               width: 75,
               height: 120,
             ),
-          Text(
-            tvShow.name,
-            style: style.copyWith(fontWeight: FontWeight.bold),
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 1.5,
+            child: Text(
+              tvShow.name,
+              style: style.copyWith(fontWeight: FontWeight.bold),
+            ),
           )
         ],
       ),
@@ -35,9 +38,12 @@ class TvRowItem extends StatelessWidget {
             (season) => Padding(
               padding: const EdgeInsets.all(8.0),
               child: ExpansionTile(
-                title: Text(
-                  season.name,
-                  style: style,
+                title: SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.5,
+                  child: Text(
+                    season.name,
+                    style: style,
+                  ),
                 ),
                 children: season.episodes
                     .map(
@@ -45,10 +51,13 @@ class TvRowItem extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            episode.name,
-                            style: style.copyWith(
-                                fontStyle: FontStyle.italic, fontSize: 15),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width / 1.5,
+                            child: Text(
+                              episode.name,
+                              style: style.copyWith(
+                                  fontStyle: FontStyle.italic, fontSize: 15),
+                            ),
                           ),
                         ),
                       ),

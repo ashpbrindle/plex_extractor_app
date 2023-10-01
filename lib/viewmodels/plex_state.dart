@@ -3,72 +3,74 @@ import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 
 class PlexState extends Equatable {
-  final PlexStatus status;
+  final PlexStatus movieStatus;
+  final PlexStatus tvShowStatus;
   final List<Movie> movies;
   final List<TvShow> tvShow;
   final String? recentIp;
   final String? error;
+  final String? lastSavedMovie;
+  final String? lastSavedTvShow;
 
   const PlexState({
-    required this.status,
+    required this.movieStatus,
+    required this.tvShowStatus,
     required this.movies,
     required this.tvShow,
     required this.recentIp,
+    required this.lastSavedMovie,
+    required this.lastSavedTvShow,
     this.error,
   });
 
   PlexState.init()
-      : status = PlexStatus.init,
+      : tvShowStatus = PlexStatus.init,
+        movieStatus = PlexStatus.init,
         movies = [],
         tvShow = [],
         recentIp = null,
-        error = null;
-  PlexState.loadingMovies({
-    required List<Movie>? movies,
-    required List<TvShow>? tvShow,
-  })  : status = PlexStatus.loadingMovies,
-        movies = movies ?? [],
-        tvShow = tvShow ?? [],
-        recentIp = null,
-        error = null;
+        error = null,
+        lastSavedMovie = null,
+        lastSavedTvShow = null;
 
-  PlexState.loadingTvShows({
-    required List<Movie>? movies,
-    required List<TvShow>? tvShow,
-  })  : status = PlexStatus.loadingTvShows,
-        movies = movies ?? [],
-        tvShow = tvShow ?? [],
-        recentIp = null,
-        error = null;
-
-  const PlexState.loaded({
-    required this.movies,
-    required this.tvShow,
-    required this.recentIp,
-  })  : status = PlexStatus.loaded,
-        error = null;
-
-  PlexState.error({
-    required this.error,
-  })  : status = PlexStatus.error,
-        recentIp = null,
-        movies = [],
-        tvShow = [];
+  PlexState copyWith({
+    List<Movie>? movies,
+    List<TvShow>? tvShow,
+    PlexStatus? movieStatus,
+    PlexStatus? tvShowStatus,
+    String? recentIp,
+    String? error,
+    String? lastSavedMovie,
+    String? lastSavedTvShow,
+  }) {
+    return PlexState(
+      movieStatus: movieStatus ?? this.movieStatus,
+      tvShowStatus: tvShowStatus ?? this.tvShowStatus,
+      movies: movies ?? this.movies,
+      tvShow: tvShow ?? this.tvShow,
+      recentIp: recentIp ?? this.recentIp,
+      error: error ?? this.error,
+      lastSavedMovie: lastSavedMovie ?? this.lastSavedMovie,
+      lastSavedTvShow: lastSavedTvShow ?? this.lastSavedTvShow,
+    );
+  }
 
   @override
-  List<Object?> get props => [status, movies, error];
+  List<Object?> get props => [
+        movieStatus,
+        tvShowStatus,
+        movies,
+        tvShow,
+        recentIp,
+        lastSavedMovie,
+        lastSavedTvShow,
+        error,
+      ];
 }
 
 enum PlexStatus {
   init,
-  loadingMovies,
-  loadingTvShows,
+  loading,
   loaded,
   error;
-
-  String getStatus([String? error]) => switch (this) {
-        PlexStatus.loadingMovies => "Loading Movies...",
-        PlexStatus.loadingTvShows => "Loading Tv Shows...",
-        _ => "Refresh Library"
-      };
 }
