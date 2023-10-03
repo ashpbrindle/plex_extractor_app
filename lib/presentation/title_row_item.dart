@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex_extractor_app/style.dart';
 
 class TitleRowItem extends StatelessWidget {
   const TitleRowItem({
@@ -23,6 +24,4 @@ class TitleRowItem extends StatelessWidget {
       ),
     );
   }
-
-  TextStyle get style => const TextStyle(fontSize: 20);
 }

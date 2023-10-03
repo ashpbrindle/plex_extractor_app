@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:plex_extractor_app/api/plex/plex_repository.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
@@ -92,7 +93,8 @@ class PlexCubit extends Cubit<PlexState> {
         state.copyWith(
           movieStatus: PlexStatus.loaded,
           movies: movies,
-          lastSavedMovie: lastSuccessfulMovieDate.toString(),
+          lastSavedMovie:
+              DateFormat('dd/MM/yyyy HH:mm').format(lastSuccessfulMovieDate),
           error: null,
         ),
       );
@@ -103,7 +105,7 @@ class PlexCubit extends Cubit<PlexState> {
             movies: state.movies,
             error: "Error Extracting Movies from Plex"),
       );
-      print(state.error);
+      print(e);
     }
     List<TvShow>? tv;
     try {
@@ -112,7 +114,8 @@ class PlexCubit extends Cubit<PlexState> {
       emit(
         state.copyWith(
           tvShowStatus: PlexStatus.loaded,
-          lastSavedTvShow: lastSuccessfulTvShowDate.toString(),
+          lastSavedTvShow:
+              DateFormat('dd/MM/yyyy HH:mm').format(lastSuccessfulTvShowDate),
           tvShow: tv,
         ),
       );
@@ -123,7 +126,7 @@ class PlexCubit extends Cubit<PlexState> {
             tvShow: state.tvShow,
             error: "Error Extracting TV Shows from Plex"),
       );
-      print(state.error);
+      print(e);
     }
     _save(movies ?? state.movies, tv ?? state.tvShow, ip,
         lastSuccessfulTvShowDate, lastSuccessfulMovieDate);

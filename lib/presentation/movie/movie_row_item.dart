@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plex_extractor_app/models/movie.dart';
+import 'package:plex_extractor_app/style.dart';
 
 class MovieRowItem extends StatelessWidget {
   const MovieRowItem({
@@ -15,14 +16,17 @@ class MovieRowItem extends StatelessWidget {
     return Row(
       children: [
         // if (movie.artworkPath != null)
-        // CachedNetworkImage(
-        //   imageUrl: movie.artworkPath!,
-        //   placeholder: (context, url) =>
-        //       const Center(child: CircularProgressIndicator()),
-        //   errorWidget: (context, url, error) => const Icon(Icons.error),
-        //   width: 75,
-        //   height: 120,
-        // ),
+        //   CachedNetworkImage(
+        //     maxHeightDiskCache: 120,
+        //     maxWidthDiskCache: 50,
+        //     imageUrl: movie.artworkPath!,
+        //     progressIndicatorBuilder: (context, url, progress) => const Center(
+        //       child: CircularProgressIndicator(),
+        //     ),
+        //     errorWidget: (context, url, error) => const Icon(Icons.error),
+        //     width: 75,
+        //     height: 120,
+        //   ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -48,6 +52,4 @@ class MovieRowItem extends StatelessWidget {
       ],
     );
   }
-
-  TextStyle get style => const TextStyle(fontSize: 20);
 }

@@ -1,7 +1,5 @@
 library tv_show;
 
-import 'dart:convert';
-
 import 'package:plex_extractor_app/models/media.dart';
 
 part 'tv_show_season.dart';

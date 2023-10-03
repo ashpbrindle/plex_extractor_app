@@ -38,15 +38,17 @@ class _PlexApi {
     final document = XmlDocument.parse(response.body);
     final videos = document.findAllElements('Video');
     for (var video in videos) {
-      var thumb = video.attributes
-          .firstWhere((p0) => p0.name.local.contains("thumb"))
-          .value;
-      var art = video.attributes
-          .firstWhere((p0) => p0.name.local.contains("thumb"))
-          .value;
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
           .value;
+      String? art;
+      try {
+        art = video.attributes
+            .firstWhere((p0) => p0.name.local.contains("thumb"))
+            .value;
+      } catch (e) {
+        print("Invalid Art for $title, not saved");
+      }
       var year = video.attributes
           .firstWhere((p0) => p0.name.local.contains("year"))
           .value;
@@ -54,7 +56,9 @@ class _PlexApi {
         Movie(
           name: title,
           year: year,
-          artworkPath: "http://$ipAddress:32400$art?X-Plex-Token=$plexToken",
+          artworkPath: art != null
+              ? "http://$ipAddress:32400$art?X-Plex-Token=$plexToken"
+              : null,
         ),
       );
     }
