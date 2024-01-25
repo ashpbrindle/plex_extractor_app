@@ -32,6 +32,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      themeMode: ThemeMode.light,
+      theme: ThemeData(useMaterial3: true),
       home: Scaffold(
         backgroundColor: const Color.fromARGB(255, 178, 193, 201),
         body: SafeArea(

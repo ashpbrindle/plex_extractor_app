@@ -74,22 +74,21 @@ class MoviesView extends StatelessWidget {
                   const SizedBox(
                     width: 10,
                   ),
-                  if (lastSavedDate != null)
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: Colors.blueGrey,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 20),
-                        child: Text(
-                          "$lastSavedDate",
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w300),
-                        ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: Colors.blueGrey,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 20),
+                      child: Text(
+                        lastSavedDate != null ? "$lastSavedDate" : "N/A",
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w300),
                       ),
                     ),
+                  ),
                 ],
               ),
               const SizedBox(

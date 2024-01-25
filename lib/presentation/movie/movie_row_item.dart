@@ -7,26 +7,28 @@ class MovieRowItem extends StatelessWidget {
   const MovieRowItem({
     super.key,
     required this.movie,
+    this.showArtwork = false,
   });
 
   final Movie movie;
+  final bool showArtwork;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // if (movie.artworkPath != null)
-        //   CachedNetworkImage(
-        //     maxHeightDiskCache: 120,
-        //     maxWidthDiskCache: 50,
-        //     imageUrl: movie.artworkPath!,
-        //     progressIndicatorBuilder: (context, url, progress) => const Center(
-        //       child: CircularProgressIndicator(),
-        //     ),
-        //     errorWidget: (context, url, error) => const Icon(Icons.error),
-        //     width: 75,
-        //     height: 120,
-        //   ),
+        if (movie.artworkPath != null && showArtwork)
+          CachedNetworkImage(
+            maxHeightDiskCache: 120,
+            maxWidthDiskCache: 50,
+            imageUrl: movie.artworkPath!,
+            progressIndicatorBuilder: (context, url, progress) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            width: 75,
+            height: 120,
+          ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

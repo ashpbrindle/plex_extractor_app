@@ -10,7 +10,7 @@ part 'plex_api.dart';
 class PlexRepository {
   final plex = _PlexApi();
 
-  Future<List<Movie>> extractMovies(String ip) async {
+  Future<List<Movie>> extractMovies(String ip, int port) async {
     final libraries = await plex.getLibraries(ip);
     List<Movie> movies = [];
     final libraryId = libraries.keys.firstWhere(
@@ -20,7 +20,7 @@ class PlexRepository {
     final path = libraries[libraryId];
     if (path != null) {
       print("Extracting $path...");
-      movies = (await plex.getMovies(libraryId, ip));
+      movies = (await plex.getMovies(libraryId, ip, port));
       print("Found ${movies.length} Movies!");
     } else {
       print("Path name \"$path\" is Invalid, skipping...");
@@ -29,7 +29,7 @@ class PlexRepository {
     return movies;
   }
 
-  Future<List<TvShow>> extractTvShows(String ip) async {
+  Future<List<TvShow>> extractTvShows(String ip, int port) async {
     final libraries = await plex.getLibraries(ip);
     List<TvShow> tvShows = [];
     final libraryId = libraries.keys.firstWhere(
@@ -38,7 +38,7 @@ class PlexRepository {
     final path = libraries[libraryId];
     if (path != null) {
       print("Extracting $path...");
-      var tvShows = (await plex.getTvShows(libraryId, ip));
+      var tvShows = (await plex.getTvShows(libraryId, ip, port));
       print("Found ${tvShows.length} Tv Shows!");
       return tvShows;
     } else {

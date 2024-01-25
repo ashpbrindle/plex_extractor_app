@@ -8,6 +8,7 @@ class PlexState extends Equatable {
   final List<Movie> movies;
   final List<TvShow> tvShow;
   final String? recentIp;
+  final int? recentPort;
   final String? error;
   final String? lastSavedMovie;
   final String? lastSavedTvShow;
@@ -18,6 +19,7 @@ class PlexState extends Equatable {
     required this.movies,
     required this.tvShow,
     required this.recentIp,
+    required this.recentPort,
     required this.lastSavedMovie,
     required this.lastSavedTvShow,
     this.error,
@@ -29,6 +31,7 @@ class PlexState extends Equatable {
         movies = [],
         tvShow = [],
         recentIp = null,
+        recentPort = null,
         error = null,
         lastSavedMovie = null,
         lastSavedTvShow = null;
@@ -39,6 +42,7 @@ class PlexState extends Equatable {
     PlexStatus? movieStatus,
     PlexStatus? tvShowStatus,
     String? recentIp,
+    int? recentPort,
     String? error,
     String? lastSavedMovie,
     String? lastSavedTvShow,
@@ -49,6 +53,7 @@ class PlexState extends Equatable {
       movies: movies ?? this.movies,
       tvShow: tvShow ?? this.tvShow,
       recentIp: recentIp ?? this.recentIp,
+      recentPort: recentPort ?? this.recentPort,
       error: error ?? this.error,
       lastSavedMovie: lastSavedMovie ?? this.lastSavedMovie,
       lastSavedTvShow: lastSavedTvShow ?? this.lastSavedTvShow,
@@ -62,6 +67,7 @@ class PlexState extends Equatable {
         movies,
         tvShow,
         recentIp,
+        recentPort,
         lastSavedMovie,
         lastSavedTvShow,
         error,

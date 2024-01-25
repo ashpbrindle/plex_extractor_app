@@ -28,11 +28,12 @@ class _PlexApi {
     return libraries;
   }
 
-  Future<List<Movie>> getMovies(String libraryId, String ipAddress) async {
+  Future<List<Movie>> getMovies(
+      String libraryId, String ipAddress, int port) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
     List<Movie> movies = [];
     final url = Uri.parse(
-      'http://$ipAddress:32400/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
+      'http://$ipAddress:$port/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
@@ -65,11 +66,12 @@ class _PlexApi {
     return movies;
   }
 
-  Future<List<TvShow>> getTvShows(String libraryId, String ipAddress) async {
+  Future<List<TvShow>> getTvShows(
+      String libraryId, String ipAddress, int port) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
     List<TvShow> tvShows = [];
     final url = Uri.parse(
-      'http://$ipAddress:32400/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
+      'http://$ipAddress:$port/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
