@@ -1,27 +1,28 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/style.dart';
 
-class MovieRowItem extends StatelessWidget {
-  const MovieRowItem({
+class MediaRowItem extends StatelessWidget {
+  const MediaRowItem({
     super.key,
-    required this.movie,
+    required this.media,
     this.showArtwork = false,
   });
 
-  final Movie movie;
+  final Media media;
   final bool showArtwork;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (movie.artworkPath != null && showArtwork)
+        if (media.artworkPath != null && showArtwork)
           CachedNetworkImage(
             maxHeightDiskCache: 120,
             maxWidthDiskCache: 50,
-            imageUrl: movie.artworkPath!,
+            imageUrl: media.artworkPath!,
             progressIndicatorBuilder: (context, url, progress) => const Center(
               child: CircularProgressIndicator(),
             ),
@@ -37,14 +38,14 @@ class MovieRowItem extends StatelessWidget {
               SizedBox(
                 width: MediaQuery.of(context).size.width / 1.5,
                 child: Text(
-                  movie.name,
+                  media.name,
                   style: style.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               SizedBox(
                 width: MediaQuery.of(context).size.width / 1.5,
                 child: Text(
-                  movie.year,
+                  media.year,
                   style: style,
                 ),
               ),

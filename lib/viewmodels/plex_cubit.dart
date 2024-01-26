@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:plex_extractor_app/api/plex/plex_repository.dart';
+import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
@@ -25,51 +26,51 @@ class PlexCubit extends Cubit<PlexState> {
   late SharedPreferences prefs;
 
   Future<void> getSavedMedia() async {
-    final movies = prefs.getString('movies');
-    final tvShows = prefs.getString('tv');
-    final lastMovie = prefs.getString("lastSaveMovie");
-    final lastTv = prefs.getString("lastSaveTv");
-    List<Movie> extractedMovies = [];
-    if (movies != null) {
-      for (var movie in jsonDecode(movies)) {
-        extractedMovies.add(Movie.fromJson(movie));
-      }
-    }
-    emit(
-      state.copyWith(
-        movies: extractedMovies,
-        movieStatus: PlexStatus.loaded,
-        error: null,
-        lastSavedMovie: lastMovie,
-        lastSavedTvShow: lastTv,
-      ),
-    );
+    // final movies = prefs.getString('movies');
+    // final tvShows = prefs.getString('tv');
+    // final lastMovie = prefs.getString("lastSaveMovie");
+    // final lastTv = prefs.getString("lastSaveTv");
+    // List<Movie> extractedMovies = [];
+    // if (movies != null) {
+    //   for (var movie in jsonDecode(movies)) {
+    //     extractedMovies.add(Movie.fromJson(movie));
+    //   }
+    // }
+    // emit(
+    //   state.copyWith(
+    //     movies: extractedMovies,
+    //     movieStatus: PlexStatus.loaded,
+    //     error: null,
+    //     lastSavedMovie: lastMovie,
+    //     lastSavedTvShow: lastTv,
+    //   ),
+    // );
 
-    List<TvShow> extractedTvShows = [];
-    if (tvShows != null) {
-      for (var tv in jsonDecode(tvShows)) {
-        extractedTvShows.add(TvShow.fromJson(tv));
-      }
-    }
-    emit(
-      state.copyWith(
-        tvShow: extractedTvShows,
-        tvShowStatus: PlexStatus.loaded,
-        error: null,
-      ),
-    );
+    // List<TvShow> extractedTvShows = [];
+    // if (tvShows != null) {
+    //   for (var tv in jsonDecode(tvShows)) {
+    //     extractedTvShows.add(TvShow.fromJson(tv));
+    //   }
+    // }
+    // emit(
+    //   state.copyWith(
+    //     tvShow: extractedTvShows,
+    //     tvShowStatus: PlexStatus.loaded,
+    //     error: null,
+    //   ),
+    // );
 
-    if (extractedMovies.isEmpty && extractedTvShows.isEmpty) {
-      emit(
-        state.copyWith(
-          movies: [],
-          tvShow: [],
-          movieStatus: PlexStatus.error,
-          tvShowStatus: PlexStatus.error,
-          error: "Failed to fetch saved media. Please Connect",
-        ),
-      );
-    }
+    // if (extractedMovies.isEmpty && extractedTvShows.isEmpty) {
+    //   emit(
+    //     state.copyWith(
+    //       movies: [],
+    //       tvShow: [],
+    //       movieStatus: PlexStatus.error,
+    //       tvShowStatus: PlexStatus.error,
+    //       error: "Failed to fetch saved media. Please Connect",
+    //     ),
+    //   );
+    // }
   }
 
   String get recentIp => prefs.getString('recentIp') ?? "";
@@ -89,62 +90,33 @@ class PlexCubit extends Cubit<PlexState> {
       state.copyWith(
         recentIp: recentIp,
         recentPort: recentPort,
-        movieStatus: PlexStatus.loading,
-        tvShowStatus: PlexStatus.loading,
         error: null,
       ),
     );
-    List<Movie>? movies;
+    Map<String, List<Media>> media;
+    String lastSuccessfulDate = "";
     try {
-      movies = await _plexRepository.extractMovies(
-        ip,
-        port,
-        movieFolder: movie1Path,
-      );
-      lastSuccessfulMovieDate =
+      media = await _plexRepository.extractEverything(ip, port);
+      lastSuccessfulDate =
           DateFormat('dd/MM/yyyy HH:MM').format(DateTime.now());
       emit(
         state.copyWith(
-          movieStatus: PlexStatus.loaded,
-          movies: movies,
-          lastSavedMovie: lastSuccessfulMovieDate,
+          status: PlexStatus.loaded,
+          media: media,
+          lastSaved: lastSuccessfulMovieDate,
           error: null,
         ),
       );
     } catch (e) {
       emit(
         state.copyWith(
-            movieStatus: PlexStatus.error,
-            movies: state.movies,
+            status: PlexStatus.error,
+            media: state.media,
             error: "Error Extracting Movies from Plex,\n $e"),
       );
     }
-    List<TvShow>? tv;
-    try {
-      tv = await _plexRepository.extractTvShows(
-        ip,
-        port,
-        tvFolder: tv1Path,
-      );
-      lastSuccessfulTvShowDate =
-          DateFormat('dd/MM/yyyy HH:MM').format(DateTime.now());
-      emit(
-        state.copyWith(
-          tvShowStatus: PlexStatus.loaded,
-          lastSavedTvShow: lastSuccessfulTvShowDate,
-          tvShow: tv,
-        ),
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(
-            tvShowStatus: PlexStatus.error,
-            tvShow: state.tvShow,
-            error: "Error Extracting TV Shows from Plex,\n $e"),
-      );
-    }
-    _save(movies ?? state.movies, tv ?? state.tvShow, ip, port,
-        lastSuccessfulTvShowDate, lastSuccessfulMovieDate);
+    // _save(movies ?? state.movies, tv ?? state.tvShow, ip, port,
+    //     lastSuccessfulTvShowDate, lastSuccessfulMovieDate);
   }
 
   Future<void> _save(

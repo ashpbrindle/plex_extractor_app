@@ -47,16 +47,16 @@ class _HomeState extends State<Home> {
           child: SingleChildScrollView(
             child: BlocBuilder<PlexCubit, PlexState>(
               builder: (context, state) {
-                List<Movie> filteredMovies = state.movies
-                    .where((movie) => movie.name
-                        .toLowerCase()
-                        .contains(searchController.text.toLowerCase()))
-                    .toList();
-                List<TvShow> filteredTvShows = state.tvShow
-                    .where((tvShow) => tvShow.name
-                        .toLowerCase()
-                        .contains(searchController.text.toLowerCase()))
-                    .toList();
+                // List<Movie> filteredMovies = state.movies
+                //     .where((movie) => movie.name
+                //         .toLowerCase()
+                //         .contains(searchController.text.toLowerCase()))
+                //     .toList();
+                // List<TvShow> filteredTvShows = state.tvShow
+                //     .where((tvShow) => tvShow.name
+                //         .toLowerCase()
+                //         .contains(searchController.text.toLowerCase()))
+                //     .toList();
                 return Column(
                   children: [
                     Container(
@@ -85,19 +85,17 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    MoviesView(
-                      movies: filteredMovies,
-                      lastSavedDate: state.lastSavedMovie,
-                      status: state.movieStatus,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TvView(
-                      tvShows: filteredTvShows,
-                      lastSavedDate: state.lastSavedTvShow,
-                      status: state.tvShowStatus,
-                    ),
+                    ...state.media.entries
+                            .map(
+                              (key) => MediaView(
+                                name: key.key,
+                                media: key.value,
+                                status: state.status,
+                                lastSavedDate: state.lastSaved,
+                              ),
+                            )
+                            .toList() ??
+                        [],
                   ],
                 );
               },

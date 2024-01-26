@@ -11,6 +11,7 @@ class TvShow extends Media {
     required super.name,
     super.artworkPath,
     this.seasons,
+    required super.year,
   });
 
   factory TvShow.fromJson(Map<String, dynamic> json) {
@@ -22,6 +23,7 @@ class TvShow extends Media {
       name: json["name"],
       artworkPath: json["path"],
       seasons: seasons,
+      year: '',
     );
   }
 

@@ -6,6 +6,7 @@ class TvShowSeason extends Media {
     required super.name,
     required this.episodes,
     super.artworkPath,
+    required super.year,
   });
   factory TvShowSeason.fromJson(Map<String, dynamic> json) {
     List<TvShowEpisode> episodes = [];
@@ -16,6 +17,7 @@ class TvShowSeason extends Media {
       name: json["name"],
       artworkPath: json["path"],
       episodes: episodes,
+      year: '',
     );
   }
 

@@ -28,6 +28,24 @@ class _PlexApi {
     return libraries;
   }
 
+  Future<Map<String, List<Media>>> getEverything(
+      Map<String, String> libraries, String ipAddress, int port) async {
+    Map<String, List<Media>> media = {};
+    for (final library in libraries.entries) {
+      final movies = await getMovies(library.key, ipAddress, port);
+      if (movies.isNotEmpty) {
+        media.putIfAbsent(library.value, () => movies);
+        continue;
+      }
+      final tv = await getTvShows(library.key, ipAddress, port);
+      if (tv.isNotEmpty) {
+        media.putIfAbsent(library.value, () => tv);
+        continue;
+      }
+    }
+    return media;
+  }
+
   Future<List<Movie>> getMovies(
       String libraryId, String ipAddress, int port) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
@@ -87,10 +105,14 @@ class _PlexApi {
             (attribute) => attribute.name.toString().contains("title"),
           )
           .value;
+      var year = directory.attributes
+          .firstWhereOrNull((p0) => p0.name.local.contains("year"))
+          ?.value;
       tvShows.add(
         TvShow(
           name: title,
           seasons: await _getTvShowSeasons(ratingKey, ipAddress),
+          year: year ?? 'Year Not Found',
         ),
       );
     }
@@ -124,6 +146,7 @@ class _PlexApi {
           TvShowSeason(
             name: name,
             episodes: await _getTvShowEpisodes(ratingKey, ip),
+            year: '',
           ),
         );
       } catch (e) {
@@ -155,6 +178,7 @@ class _PlexApi {
         TvShowEpisode(
           name: title,
           artworkPath: "http://$ip:32400$thumb?X-Plex-Token=$plexToken",
+          year: '',
         ),
       );
     }
