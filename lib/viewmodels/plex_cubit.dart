@@ -75,7 +75,14 @@ class PlexCubit extends Cubit<PlexState> {
   String get recentIp => prefs.getString('recentIp') ?? "";
   int? get recentPort => prefs.getInt('recentPort');
 
-  void extractMedia(String ip, int port) async {
+  void extractMedia(
+    String ip,
+    int port, {
+    String? movie1Path,
+    String? movie2Path,
+    String? tv1Path,
+    String? tv2Path,
+  }) async {
     String? lastSuccessfulMovieDate;
     String? lastSuccessfulTvShowDate;
     emit(
@@ -89,7 +96,11 @@ class PlexCubit extends Cubit<PlexState> {
     );
     List<Movie>? movies;
     try {
-      movies = await _plexRepository.extractMovies(ip, port);
+      movies = await _plexRepository.extractMovies(
+        ip,
+        port,
+        movieFolder: movie1Path,
+      );
       lastSuccessfulMovieDate =
           DateFormat('dd/MM/yyyy HH:MM').format(DateTime.now());
       emit(
@@ -110,7 +121,11 @@ class PlexCubit extends Cubit<PlexState> {
     }
     List<TvShow>? tv;
     try {
-      tv = await _plexRepository.extractTvShows(ip, port);
+      tv = await _plexRepository.extractTvShows(
+        ip,
+        port,
+        tvFolder: tv1Path,
+      );
       lastSuccessfulTvShowDate =
           DateFormat('dd/MM/yyyy HH:MM').format(DateTime.now());
       emit(

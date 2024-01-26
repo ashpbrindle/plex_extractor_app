@@ -10,12 +10,17 @@ part 'plex_api.dart';
 class PlexRepository {
   final plex = _PlexApi();
 
-  Future<List<Movie>> extractMovies(String ip, int port) async {
+  Future<List<Movie>> extractMovies(
+    String ip,
+    int port, {
+    String? movieFolder,
+  }) async {
     final libraries = await plex.getLibraries(ip);
     List<Movie> movies = [];
     final libraryId = libraries.keys.firstWhere(
-      (key) => (libraries[key]!.toLowerCase().contains("movie") ||
-          libraries[key]!.toLowerCase().contains("film")),
+      (key) =>
+          (libraries[key]!.toLowerCase().contains(movieFolder ?? "movie") ||
+              libraries[key]!.toLowerCase().contains(movieFolder ?? "film")),
     );
     final path = libraries[libraryId];
     if (path != null) {
@@ -29,11 +34,15 @@ class PlexRepository {
     return movies;
   }
 
-  Future<List<TvShow>> extractTvShows(String ip, int port) async {
+  Future<List<TvShow>> extractTvShows(
+    String ip,
+    int port, {
+    String? tvFolder,
+  }) async {
     final libraries = await plex.getLibraries(ip);
     List<TvShow> tvShows = [];
     final libraryId = libraries.keys.firstWhere(
-      (key) => (libraries[key]!.toLowerCase().contains("tv")),
+      (key) => (libraries[key]!.toLowerCase().contains(tvFolder ?? "tv")),
     );
     final path = libraries[libraryId];
     if (path != null) {
