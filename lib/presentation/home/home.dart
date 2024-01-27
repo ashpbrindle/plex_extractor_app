@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/presentation/home/folder_path_drop_down.dart';
 import 'package:plex_extractor_app/presentation/home/movies_view.dart';
@@ -21,19 +20,11 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController searchController = TextEditingController();
-  final TextEditingController movies1Controller = TextEditingController();
-  final TextEditingController movies2Controller = TextEditingController();
-  final TextEditingController tv1Controller = TextEditingController();
-  final TextEditingController tv2Controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     searchController.addListener(() => setState(() {}));
-    movies1Controller.addListener(() => setState(() {}));
-    movies2Controller.addListener(() => setState(() {}));
-    tv1Controller.addListener(() => setState(() {}));
-    tv2Controller.addListener(() => setState(() {}));
   }
 
   @override
@@ -65,37 +56,47 @@ class _HomeState extends State<Home> {
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
-                            PlexConnect(
-                              movies1Path: movies1Controller.text,
-                              movies2Path: movies2Controller.text,
-                              tv1Path: tv1Controller.text,
-                              tv2Path: tv2Controller.text,
-                            ),
+                            const PlexConnect(),
                             TextInput(
                               controller: searchController,
                               hintText: "Search...",
                             ),
-                            FolderPathDropDown(
-                              movies1Controller: movies1Controller,
-                              movies2Controller: movies2Controller,
-                              tv1Controller: tv1Controller,
-                              tv2Controller: tv2Controller,
-                            )
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.blueGrey,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 20),
+                                child: Text(
+                                  state.lastSaved != null
+                                      ? "${state.lastSaved}"
+                                      : "N/A",
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                     ...state.media.entries
-                            .map(
-                              (key) => MediaView(
-                                name: key.key,
-                                media: key.value,
-                                status: state.status,
-                                lastSavedDate: state.lastSaved,
-                              ),
-                            )
-                            .toList() ??
-                        [],
+                        .map(
+                          (key) => key.value.first is TvShow
+                              ? TvView(
+                                  tvShows: key.value as List<TvShow>,
+                                  status: state.status,
+                                )
+                              : MediaView(
+                                  name: key.key,
+                                  media: key.value,
+                                  status: state.status,
+                                ),
+                        )
+                        .toList(),
                   ],
                 );
               },

@@ -30,14 +30,7 @@ class RefreshButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         if (ip.isEmpty || port.isEmpty) return;
-        return context.read<PlexCubit>().extractMedia(
-              ip,
-              int.parse(port),
-              movie1Path: movies1Path,
-              movie2Path: movies2Path,
-              tv1Path: tv1Path,
-              tv2Path: tv2Path,
-            );
+        return context.read<PlexCubit>().extractMedia(ip, int.parse(port));
       },
       child: Opacity(
         opacity: ip.isEmpty || port.isEmpty ? 0.2 : 1.0,

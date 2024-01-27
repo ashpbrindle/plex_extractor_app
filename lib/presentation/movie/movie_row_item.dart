@@ -18,18 +18,6 @@ class MediaRowItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (media.artworkPath != null && showArtwork)
-          CachedNetworkImage(
-            maxHeightDiskCache: 120,
-            maxWidthDiskCache: 50,
-            imageUrl: media.artworkPath!,
-            progressIndicatorBuilder: (context, url, progress) => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-            width: 75,
-            height: 120,
-          ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

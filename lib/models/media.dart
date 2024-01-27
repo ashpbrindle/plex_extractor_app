@@ -1,11 +1,11 @@
 abstract class Media {
   final String name;
   final String year;
-  final String? artworkPath;
+  final String type;
 
   Media({
     required this.name,
     required this.year,
-    this.artworkPath,
+    required this.type,
   });
 }

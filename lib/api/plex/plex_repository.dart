@@ -15,7 +15,7 @@ class PlexRepository {
   Future<Map<String, List<Media>>> extractEverything(
       String ip, int port) async {
     final libraries = await plex.getLibraries(ip);
-    // Library, List<Media>
+    // {Library, List<Media>}
     return plex.getEverything(libraries, ip, port);
   }
 

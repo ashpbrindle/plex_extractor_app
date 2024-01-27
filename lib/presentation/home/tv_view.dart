@@ -8,12 +8,10 @@ class TvView extends StatelessWidget {
     super.key,
     required this.tvShows,
     required this.status,
-    required this.lastSavedDate,
   });
 
   final List<TvShow> tvShows;
   final PlexStatus status;
-  final String? lastSavedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -63,24 +61,6 @@ class TvView extends StatelessWidget {
                       child: Text(
                         "${tvShows.length}",
                         style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Colors.blueGrey,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 20),
-                      child: Text(
-                        lastSavedDate != null ? "$lastSavedDate" : "N/A",
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w300),
                       ),
                     ),
                   ),

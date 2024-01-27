@@ -10,13 +10,11 @@ class MediaView extends StatelessWidget {
     required this.name,
     required this.media,
     required this.status,
-    required this.lastSavedDate,
   });
 
   final String name;
   final List<Media> media;
   final PlexStatus status;
-  final String? lastSavedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -71,24 +69,6 @@ class MediaView extends StatelessWidget {
                       child: Text(
                         "${media.length}",
                         style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Colors.blueGrey,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 20),
-                      child: Text(
-                        lastSavedDate != null ? "$lastSavedDate" : "N/A",
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w300),
                       ),
                     ),
                   ),

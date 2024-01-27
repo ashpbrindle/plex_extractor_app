@@ -9,9 +9,9 @@ class TvShow extends Media {
   final List<TvShowSeason>? seasons;
   TvShow({
     required super.name,
-    super.artworkPath,
     this.seasons,
     required super.year,
+    required super.type,
   });
 
   factory TvShow.fromJson(Map<String, dynamic> json) {
@@ -21,15 +21,15 @@ class TvShow extends Media {
     }
     return TvShow(
       name: json["name"],
-      artworkPath: json["path"],
       seasons: seasons,
+      type: json["type"],
       year: '',
     );
   }
 
   Map<String, dynamic> toJson() => {
         "name": name,
-        "path": artworkPath,
+        "type": type,
         "seasons": seasons,
       };
 }

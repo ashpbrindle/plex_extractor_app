@@ -4,18 +4,18 @@ class Movie extends Media {
   Movie({
     required super.name,
     required super.year,
-    required super.artworkPath,
+    required super.type,
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) => Movie(
         name: json["name"],
-        artworkPath: json["path"],
         year: json["year"],
+        type: json["type"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
-        "path": artworkPath,
         "year": year,
+        "type": type,
       };
 }

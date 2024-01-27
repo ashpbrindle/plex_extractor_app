@@ -17,15 +17,6 @@ class TvRowItem extends StatelessWidget {
     return ExpansionTile(
       title: Row(
         children: [
-          if (tvShow.artworkPath != null)
-            CachedNetworkImage(
-              imageUrl: tvShow.artworkPath!,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              width: 75,
-              height: 120,
-            ),
           SizedBox(
             width: MediaQuery.of(context).size.width / 1.5,
             child: Text(
