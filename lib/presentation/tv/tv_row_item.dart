@@ -15,7 +15,7 @@ class TvRowItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      title: Row(
+      title: Column(
         children: [
           SizedBox(
             width: MediaQuery.of(context).size.width / 1.5,
@@ -23,7 +23,14 @@ class TvRowItem extends StatelessWidget {
               tvShow.name,
               style: style.copyWith(fontWeight: FontWeight.bold),
             ),
-          )
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 1.5,
+            child: Text(
+              tvShow.year,
+              style: style,
+            ),
+          ),
         ],
       ),
       children: (tvShow.seasons ?? [])

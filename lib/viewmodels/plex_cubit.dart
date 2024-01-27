@@ -76,6 +76,7 @@ class PlexCubit extends Cubit<PlexState> {
   int? get recentPort => prefs.getInt('recentPort');
 
   void extractMedia(String ip, int port) async {
+    emit(state.copyWith(status: PlexStatus.loading));
     emit(
       state.copyWith(
         recentIp: recentIp,

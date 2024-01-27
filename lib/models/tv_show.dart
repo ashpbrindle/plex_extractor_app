@@ -23,7 +23,7 @@ class TvShow extends Media {
       name: json["name"],
       seasons: seasons,
       type: json["type"],
-      year: '',
+      year: json["year"],
     );
   }
 
@@ -31,5 +31,6 @@ class TvShow extends Media {
         "name": name,
         "type": type,
         "seasons": seasons,
+        "year": year,
       };
 }
