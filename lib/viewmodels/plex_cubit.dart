@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -16,9 +19,22 @@ class PlexCubit extends Cubit<PlexState> {
         super(PlexState.init()) {
     init();
   }
+  ReceivePort receivePort = ReceivePort();
 
   Future<void> init() async {
     prefs = await SharedPreferences.getInstance();
+    IsolateNameServer.registerPortWithName(
+      receivePort.sendPort,
+      "messages",
+    );
+
+    receivePort.listen((message) {
+      print(message);
+      var newMessages = state.messages;
+      newMessages.add(message);
+      emit(state.copyWith(messages: newMessages));
+    });
+
     await getSavedMedia();
   }
 
@@ -76,7 +92,7 @@ class PlexCubit extends Cubit<PlexState> {
   int? get recentPort => prefs.getInt('recentPort');
 
   void extractMedia(String ip, int port) async {
-    emit(state.copyWith(status: PlexStatus.loading));
+    emit(state.copyWith(status: PlexStatus.loading, messages: []));
     emit(
       state.copyWith(
         recentIp: recentIp,
@@ -127,5 +143,11 @@ class PlexCubit extends Cubit<PlexState> {
     await prefs.setString('media', full);
     await prefs.setString('recentIp', recentIp);
     await prefs.setInt('recentPort', recentPort);
+  }
+
+  @override
+  Future<void> close() {
+    receivePort.drain();
+    return super.close();
   }
 }

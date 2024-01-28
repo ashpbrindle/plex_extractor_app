@@ -11,7 +11,7 @@ class _PlexApi {
         'http://$ipAddress:32400/library/sections/?X-Plex-Token=$plexToken');
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
-    // print(document);
+    // log.debug('...');(document);
     final directories = document.findAllElements('Directory');
     for (final directory in directories) {
       final key = directory.attributes
@@ -24,7 +24,6 @@ class _PlexApi {
         libraries.putIfAbsent(key, () => value);
       }
     }
-    print(libraries);
     return libraries;
   }
 
@@ -37,12 +36,15 @@ class _PlexApi {
         List<Movie> movies = await getMovies(library.key, ipAddress, port);
         if (movies.isNotEmpty) {
           media.putIfAbsent(library.value, () => movies);
+
+          updateStatus("${library.value}: Found ${movies.length} Movies");
           continue;
         }
       } else if (type == "show") {
         final tv = await getTvShows(library.key, ipAddress, port);
         if (tv.isNotEmpty) {
           media.putIfAbsent(library.value, () => tv);
+          updateStatus("${library.value}: Found ${tv.length} TV Shows");
           continue;
         }
       } else if (type == "photo") {
@@ -50,6 +52,7 @@ class _PlexApi {
       } else {
         continue;
       }
+      updateStatus("${library.key} Finished");
     }
     return media;
   }
@@ -85,14 +88,6 @@ class _PlexApi {
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
           .value;
-      String? art;
-      try {
-        art = video.attributes
-            .firstWhere((p0) => p0.name.local.contains("thumb"))
-            .value;
-      } catch (e) {
-        print("Invalid Art for $title, not saved");
-      }
       var year = video.attributes
           .firstWhere((p0) => p0.name.local.contains("year"))
           .value;
@@ -172,9 +167,7 @@ class _PlexApi {
             episodes: await _getTvShowEpisodes(ratingKey, ip),
           ),
         );
-      } catch (e) {
-        print("Invalid Tv Show, Skipping...");
-      }
+      } catch (e) {}
     }
     return seasons;
   }
@@ -199,5 +192,9 @@ class _PlexApi {
       );
     }
     return episodes;
+  }
+
+  void updateStatus(String text) {
+    IsolateNameServer.lookupPortByName("messages")?.send(text);
   }
 }

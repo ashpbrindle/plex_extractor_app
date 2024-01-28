@@ -30,6 +30,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: globalNavigatorKey,
       themeMode: ThemeMode.light,
       theme: ThemeData(useMaterial3: true),
       home: Scaffold(
@@ -108,6 +109,7 @@ class _HomeState extends State<Home> {
                       }
                       return const SizedBox();
                     }).toList(),
+                    ...state.messages.map((e) => Text(e)),
                   ],
                 );
               },
@@ -118,3 +120,5 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+final globalNavigatorKey = GlobalKey<NavigatorState>();
