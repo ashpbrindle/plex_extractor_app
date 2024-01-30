@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:plex_extractor_app/presentation/home/refresh_button.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlexConnect extends StatefulWidget {
-  const PlexConnect({super.key});
+  const PlexConnect({
+    super.key,
+    this.movies1Path,
+    this.movies2Path,
+    this.tv1Path,
+    this.tv2Path,
+  });
+
+  final String? movies1Path;
+  final String? movies2Path;
+  final String? tv1Path;
+  final String? tv2Path;
 
   @override
   State<PlexConnect> createState() => _PlexConnectState();
@@ -107,45 +119,19 @@ class _PlexConnectState extends State<PlexConnect> {
               const SizedBox(
                 width: 10,
               ),
-              getPlexIcon(state, controller.text, portController.text)
+              RefreshButton(
+                state,
+                ip: controller.text,
+                port: portController.text,
+                movies1Path: widget.movies1Path,
+                movies2Path: widget.movies2Path,
+                tv1Path: widget.tv1Path,
+                tv2Path: widget.tv2Path,
+              )
             ],
           ),
         );
       },
-    );
-  }
-
-  Widget getPlexIcon(PlexState state, String ip, String port) {
-    bool showConnect = state.movies.isEmpty && state.tvShow.isEmpty;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        if (ip.isEmpty || port.isEmpty) return;
-        return context.read<PlexCubit>().extractMedia(
-              controller.text,
-              int.parse(portController.text),
-            );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: ip.isEmpty || port.isEmpty
-              ? Colors.grey
-              : (showConnect ? Colors.green : Colors.purple),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(30),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Icon(
-              showConnect ? Icons.cloud_download : Icons.sync,
-              color:
-                  ip.isEmpty || port.isEmpty ? Colors.blueGrey : Colors.white,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

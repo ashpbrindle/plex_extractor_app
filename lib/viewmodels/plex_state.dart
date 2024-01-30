@@ -1,75 +1,61 @@
 import 'package:equatable/equatable.dart';
-import 'package:plex_extractor_app/models/movie.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
+import 'package:plex_extractor_app/models/media.dart';
 
 class PlexState extends Equatable {
-  final PlexStatus movieStatus;
-  final PlexStatus tvShowStatus;
-  final List<Movie> movies;
-  final List<TvShow> tvShow;
+  final Map<String, List<Media>> media;
+  final PlexStatus status;
   final String? recentIp;
   final int? recentPort;
   final String? error;
-  final String? lastSavedMovie;
-  final String? lastSavedTvShow;
+  final List<String> messages;
+  final String? lastSaved;
 
   const PlexState({
-    required this.movieStatus,
-    required this.tvShowStatus,
-    required this.movies,
-    required this.tvShow,
     required this.recentIp,
+    required this.messages,
     required this.recentPort,
-    required this.lastSavedMovie,
-    required this.lastSavedTvShow,
+    required this.media,
+    required this.status,
+    required this.lastSaved,
     this.error,
   });
 
   PlexState.init()
-      : tvShowStatus = PlexStatus.init,
-        movieStatus = PlexStatus.init,
-        movies = [],
-        tvShow = [],
+      : lastSaved = null,
+        status = PlexStatus.init,
+        messages = [],
+        media = {},
         recentIp = null,
         recentPort = null,
-        error = null,
-        lastSavedMovie = null,
-        lastSavedTvShow = null;
+        error = null;
 
   PlexState copyWith({
-    List<Movie>? movies,
-    List<TvShow>? tvShow,
-    PlexStatus? movieStatus,
-    PlexStatus? tvShowStatus,
+    Map<String, List<Media>>? media,
+    PlexStatus? status,
+    List<String>? messages,
     String? recentIp,
     int? recentPort,
     String? error,
-    String? lastSavedMovie,
-    String? lastSavedTvShow,
+    String? lastSaved,
   }) {
     return PlexState(
-      movieStatus: movieStatus ?? this.movieStatus,
-      tvShowStatus: tvShowStatus ?? this.tvShowStatus,
-      movies: movies ?? this.movies,
-      tvShow: tvShow ?? this.tvShow,
       recentIp: recentIp ?? this.recentIp,
+      messages: messages ?? this.messages,
       recentPort: recentPort ?? this.recentPort,
       error: error ?? this.error,
-      lastSavedMovie: lastSavedMovie ?? this.lastSavedMovie,
-      lastSavedTvShow: lastSavedTvShow ?? this.lastSavedTvShow,
+      media: media ?? this.media,
+      status: status ?? this.status,
+      lastSaved: lastSaved ?? this.lastSaved,
     );
   }
 
   @override
   List<Object?> get props => [
-        movieStatus,
-        tvShowStatus,
-        movies,
-        tvShow,
+        status,
+        media,
         recentIp,
         recentPort,
-        lastSavedMovie,
-        lastSavedTvShow,
+        lastSaved,
         error,
       ];
 }

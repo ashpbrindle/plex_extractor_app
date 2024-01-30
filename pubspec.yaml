@@ -20,6 +20,7 @@ dependencies:
   shared_preferences: ^2.2.1
   cached_network_image: ^3.3.0
   intl: ^0.18.1
+  collection: ^1.17.2
 
 dev_dependencies:
   flutter_test:

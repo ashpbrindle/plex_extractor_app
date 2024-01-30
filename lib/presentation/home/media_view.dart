@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/presentation/movie/movie_row_item.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
-class MoviesView extends StatelessWidget {
-  const MoviesView({
+class MediaView extends StatelessWidget {
+  const MediaView({
     super.key,
-    required this.movies,
+    required this.name,
+    required this.media,
     required this.status,
-    required this.lastSavedDate,
   });
 
-  final List<Movie> movies;
+  final String name;
+  final List<Media> media;
   final PlexStatus status;
-  final String? lastSavedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class MoviesView extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      const Text("Movies"),
+                      Text(name),
                     ],
                   ),
                 ],
@@ -66,26 +67,8 @@ class MoviesView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 20),
                       child: Text(
-                        "${movies.length}",
+                        "${media.length}",
                         style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Colors.blueGrey,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 20),
-                      child: Text(
-                        lastSavedDate != null ? "$lastSavedDate" : "N/A",
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w300),
                       ),
                     ),
                   ),
@@ -97,19 +80,19 @@ class MoviesView extends StatelessWidget {
             ],
           ),
           children: [
-            if (movies.isNotEmpty)
-              ...movies
+            if (media.isNotEmpty)
+              ...media
                   .map(
-                    (e) => MovieRowItem(movie: e),
+                    (e) => MediaRowItem(media: e),
                   )
                   .toList(),
           ],
         ),
-        if (status == PlexStatus.loading)
-          LinearProgressIndicator(
-            color: Colors.orange,
-            backgroundColor: Colors.orange.withOpacity(0.3),
-          ),
+        // if (status == PlexStatus.loading)
+        //   LinearProgressIndicator(
+        //     color: Colors.orange,
+        //     backgroundColor: Colors.orange.withOpacity(0.3),
+        //   ),
       ],
     );
   }

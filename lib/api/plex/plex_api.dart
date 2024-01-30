@@ -11,7 +11,7 @@ class _PlexApi {
         'http://$ipAddress:32400/library/sections/?X-Plex-Token=$plexToken');
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
-    // print(document);
+    // log.debug('...');(document);
     final directories = document.findAllElements('Directory');
     for (final directory in directories) {
       final key = directory.attributes
@@ -24,8 +24,54 @@ class _PlexApi {
         libraries.putIfAbsent(key, () => value);
       }
     }
-    print(libraries);
     return libraries;
+  }
+
+  Future<Map<String, List<Media>>> getEverything(
+      Map<String, String> libraries, String ipAddress, int port) async {
+    Map<String, List<Media>> media = {};
+    for (final library in libraries.entries) {
+      final type = await _extractType(library.key, ipAddress, port);
+      if (type == "movie") {
+        List<Movie> movies = await getMovies(library.key, ipAddress, port);
+        if (movies.isNotEmpty) {
+          media.putIfAbsent(library.value, () => movies);
+
+          updateStatus("${library.value}: Found ${movies.length} Movies");
+          continue;
+        }
+      } else if (type == "show") {
+        final tv = await getTvShows(library.key, ipAddress, port);
+        if (tv.isNotEmpty) {
+          media.putIfAbsent(library.value, () => tv);
+          updateStatus("${library.value}: Found ${tv.length} TV Shows");
+          continue;
+        }
+      } else if (type == "photo") {
+        continue;
+      } else {
+        continue;
+      }
+      updateStatus("${library.key} Finished");
+    }
+    return media;
+  }
+
+  Future<String?> _extractType(String key, String ip, int port) async {
+    final url = Uri.parse(
+      'http://$ip:$port/library/sections/$key/all?X-Plex-Token=$plexToken&',
+    );
+    final response = await http.get(url);
+    final document = XmlDocument.parse(response.body);
+    final mediaContainer = document.findAllElements('MediaContainer');
+    String? viewGroup;
+    for (var container in mediaContainer) {
+      viewGroup = container.attributes
+          .firstWhereOrNull((p0) => p0.name.local.contains("viewGroup"))
+          ?.value;
+      if (viewGroup != null) break;
+    }
+    return viewGroup;
   }
 
   Future<List<Movie>> getMovies(
@@ -42,14 +88,6 @@ class _PlexApi {
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
           .value;
-      String? art;
-      try {
-        art = video.attributes
-            .firstWhere((p0) => p0.name.local.contains("thumb"))
-            .value;
-      } catch (e) {
-        print("Invalid Art for $title, not saved");
-      }
       var year = video.attributes
           .firstWhere((p0) => p0.name.local.contains("year"))
           .value;
@@ -57,9 +95,7 @@ class _PlexApi {
         Movie(
           name: title,
           year: year,
-          artworkPath: art != null
-              ? "http://$ipAddress:32400$art?X-Plex-Token=$plexToken"
-              : null,
+          type: "movie",
         ),
       );
     }
@@ -87,10 +123,15 @@ class _PlexApi {
             (attribute) => attribute.name.toString().contains("title"),
           )
           .value;
+      var year = directory.attributes
+          .firstWhereOrNull((p0) => p0.name.local.contains("year"))
+          ?.value;
       tvShows.add(
         TvShow(
           name: title,
           seasons: await _getTvShowSeasons(ratingKey, ipAddress),
+          year: year ?? 'Year Not Found',
+          type: 'tvShow',
         ),
       );
     }
@@ -126,9 +167,7 @@ class _PlexApi {
             episodes: await _getTvShowEpisodes(ratingKey, ip),
           ),
         );
-      } catch (e) {
-        print("Invalid Tv Show, Skipping...");
-      }
+      } catch (e) {}
     }
     return seasons;
   }
@@ -145,19 +184,17 @@ class _PlexApi {
     final document = XmlDocument.parse(response.body);
     final videos = document.findAllElements('Video');
     for (var video in videos) {
-      var thumb = video.attributes
-          .firstWhere((p0) => p0.name.local.contains("thumb"))
-          .value;
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
           .value;
       episodes.add(
-        TvShowEpisode(
-          name: title,
-          artworkPath: "http://$ip:32400$thumb?X-Plex-Token=$plexToken",
-        ),
+        TvShowEpisode(title),
       );
     }
     return episodes;
+  }
+
+  void updateStatus(String text) {
+    IsolateNameServer.lookupPortByName("messages")?.send(text);
   }
 }
