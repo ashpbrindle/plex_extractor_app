@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/presentation/home/media_view.dart';
 import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
+import 'package:plex_extractor_app/presentation/home/selection_drawer.dart';
+import 'package:plex_extractor_app/presentation/home/status_view.dart';
 import 'package:plex_extractor_app/presentation/home/text_input.dart';
 import 'package:plex_extractor_app/presentation/home/tv_view.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
@@ -35,74 +38,77 @@ class _HomeState extends State<Home> {
       themeMode: ThemeMode.light,
       theme: ThemeData(useMaterial3: true),
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 178, 193, 201),
+        ),
+        drawer: const SelectionDrawer(),
         backgroundColor: const Color.fromARGB(255, 178, 193, 201),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: BlocBuilder<PlexCubit, PlexState>(
-              builder: (context, state) {
-                List<PlexLibrary> filteredMovies =
-                    _filteredMovies(state.media, searchController.text);
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      color: const Color.fromARGB(255, 14, 25, 74),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            const PlexConnect(),
-                            TextInput(
-                              controller: searchController,
-                              hintText: "Search...",
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                color: Colors.blueGrey,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 20),
-                                child: Text(
-                                  state.lastSaved != null
-                                      ? "${state.lastSaved}"
-                                      : "N/A",
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w300),
+          child: BlocBuilder<PlexCubit, PlexState>(
+            builder: (context, state) {
+              List<PlexLibrary> filteredMovies =
+                  _filteredMovies(state.media, searchController.text);
+              return state.media.isNotEmpty
+                  ? Column(
+                      children: [
+                        TextInput(
+                          controller: searchController,
+                          hintText: "Search...",
+                        ),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: CustomScrollView(
+                            slivers: [
+                              ...filteredMovies.map(
+                                (e) => SliverStickyHeader(
+                                  header: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Container(
+                                        decoration: const BoxDecoration(
+                                          color:
+                                              Color.fromARGB(255, 14, 25, 74),
+                                          border: Border.symmetric(
+                                            horizontal:
+                                                BorderSide(color: Colors.white),
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              e.name,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  sliver: SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, i) => Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Text(e.items[i].name),
+                                      ),
+                                      childCount: e.items.length,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                    ...filteredMovies.map((library) {
-                      if (library.items.isEmpty) {
-                        return MediaView(
-                            name: library.name,
-                            media: library.items,
-                            status: library.status);
-                      } else {
-                        if (library.items.first is TvShow) {
-                          return TvView(
-                            tvShows: library.items.cast<TvShow>().toList(),
-                            status: library.status,
-                          );
-                        } else {
-                          return MediaView(
-                            name: library.name,
-                            media: library.items,
-                            status: library.status,
-                          );
-                        }
-                      }
-                    }).toList(),
-                  ],
-                );
-              },
-            ),
+                      ],
+                    )
+                  : Center(
+                      child: Text(state.error ??
+                          "No Data found, Open the menu to Connect"),
+                    );
+            },
           ),
         ),
       ),
@@ -122,7 +128,7 @@ class _HomeState extends State<Home> {
                 items: filteredItems,
                 status: library.status);
           })
-          .where((library) => library.items.isNotEmpty)
+          .where((element) => element.items.isNotEmpty)
           .toList();
 }
 

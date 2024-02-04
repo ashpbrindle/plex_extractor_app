@@ -63,73 +63,70 @@ class _PlexConnectState extends State<PlexConnect> {
       listenWhen: (state1, state2) =>
           state1.error != state2.error && state2.error != null,
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Container(
-                      width: 150,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade400,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          bottomLeft: Radius.circular(30),
-                        ),
+        return Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(30),
                       ),
-                      child: Center(
-                        child: TextField(
-                          style: const TextStyle(fontSize: 12),
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            hintText: "Enter IP Address",
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
+                    ),
+                    child: Center(
+                      child: TextField(
+                        style: const TextStyle(fontSize: 12),
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          hintText: "Enter IP Address",
+                          contentPadding: EdgeInsets.all(10.0),
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
-                    Container(
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade400,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                        ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(30),
                       ),
-                      child: Center(
-                        child: TextField(
-                          style: const TextStyle(fontSize: 12),
-                          keyboardType: TextInputType.number,
-                          controller: portController,
-                          decoration: const InputDecoration(
-                            hintText: "Enter Port",
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
+                    ),
+                    child: Center(
+                      child: TextField(
+                        style: const TextStyle(fontSize: 12),
+                        keyboardType: TextInputType.number,
+                        controller: portController,
+                        decoration: const InputDecoration(
+                          hintText: "Enter Port",
+                          contentPadding: EdgeInsets.all(10.0),
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(
-                width: 10,
-              ),
-              RefreshButton(
-                state,
-                ip: controller.text,
-                port: portController.text,
-                movies1Path: widget.movies1Path,
-                movies2Path: widget.movies2Path,
-                tv1Path: widget.tv1Path,
-                tv2Path: widget.tv2Path,
-              )
-            ],
-          ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            RefreshButton(
+              state,
+              ip: controller.text,
+              port: portController.text,
+              movies1Path: widget.movies1Path,
+              movies2Path: widget.movies2Path,
+              tv1Path: widget.tv1Path,
+              tv2Path: widget.tv2Path,
+            )
+          ],
         );
       },
     );

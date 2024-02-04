@@ -49,6 +49,8 @@ class PlexCubit extends Cubit<PlexState> {
             extractedTv.add(TvShow.fromJson(show));
           }
           extractedMedia.putIfAbsent(name, () => extractedTv);
+        } else {
+          extractedMedia.putIfAbsent(name, () => []);
         }
       }
     }
@@ -119,20 +121,34 @@ class PlexCubit extends Cubit<PlexState> {
   }
 
   Future<void> _retrieveNewMedia(String ip, int port) async {
-    final libraries = await _plexRepository.getLibraries(ip, port);
-    List<PlexLibrary> plexLibraries = [];
-    libraries.forEach(
-      (id, name) => plexLibraries.add(
-        PlexLibrary(
-          name: name,
-          id: id,
-          items: const [],
-          status: PlexStatus.loading,
+    try {
+      final libraries = await _plexRepository.getLibraries(ip, port);
+      List<PlexLibrary> plexLibraries = [];
+      libraries.forEach(
+        (id, name) => plexLibraries.add(
+          PlexLibrary(
+            name: name,
+            id: id,
+            items: const [],
+            status: PlexStatus.loading,
+          ),
         ),
-      ),
-    );
-    emit(state.copyWith(media: [...plexLibraries]));
-    print("Found ${state.media.map((e) => e.name)}");
+      );
+      emit(state.copyWith(media: [...plexLibraries]));
+      print("Found ${state.media.map((e) => e.name)}");
+    } catch (e) {
+      List<PlexLibrary> newMedia = [...state.media];
+      for (int i = 0; i < newMedia.length; i++) {
+        newMedia[i] = newMedia[i].copyWith(status: PlexStatus.error);
+      }
+      emit(
+        state.copyWith(
+          globalStatus: PlexStatus.error,
+          error: "$e",
+          media: [...newMedia],
+        ),
+      );
+    }
   }
 
   void _moveLibrariesToLoading(String ip, int port) {
@@ -153,13 +169,13 @@ class PlexCubit extends Cubit<PlexState> {
   }
 
   Future<void> _save(
-    List<PlexLibrary> media,
+    List<PlexLibrary> medias,
     String recentIp,
     int recentPort,
     String? lastSave,
   ) async {
     String full = "";
-    for (var media in media) {
+    for (var media in medias) {
       if (full.isEmpty) {
         final json = jsonEncode(media.items);
         full = "${media.name},$json";
@@ -168,6 +184,7 @@ class PlexCubit extends Cubit<PlexState> {
       }
     }
     lastSave != null ? await prefs.setString('lastSave', lastSave) : null;
+    print(full);
     await prefs.setString('media', full);
     await prefs.setString('recentIp', recentIp);
     await prefs.setInt('recentPort', recentPort);
