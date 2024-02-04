@@ -4,6 +4,7 @@ import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/presentation/home/media_view.dart';
 import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
+import 'package:plex_extractor_app/presentation/home/status_view.dart';
 import 'package:plex_extractor_app/presentation/home/text_input.dart';
 import 'package:plex_extractor_app/presentation/home/tv_view.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
@@ -39,17 +40,18 @@ class _HomeState extends State<Home> {
           child: SingleChildScrollView(
             child: BlocBuilder<PlexCubit, PlexState>(
               builder: (context, state) {
-                Map<String, List<Media>> filteredMovies = {};
-                for (final media in state.media.entries) {
-                  filteredMovies.putIfAbsent(
-                      media.key,
-                      () => media.value
-                          .where((movie) => movie.name
-                              .toLowerCase()
-                              .contains(searchController.text.toLowerCase()))
-                          .toList());
-                }
+                // Map<String, List<Media>> filteredMovies = {};
+                // for (final media in state.media.entries) {
+                //   filteredMovies.putIfAbsent(
+                //       media.key,
+                //       () => media.value
+                //           .where((movie) => movie.name
+                //               .toLowerCase()
+                //               .contains(searchController.text.toLowerCase()))
+                //           .toList());
+                // }
                 return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
                       color: const Color.fromARGB(255, 14, 25, 74),
@@ -84,32 +86,32 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    if (state.status == PlexStatus.loading)
-                      LinearProgressIndicator(
-                        color: Colors.orange,
-                        backgroundColor: Colors.orange.withOpacity(0.3),
-                      ),
-                    ...filteredMovies.entries.map((entry) {
-                      final key = entry.key;
-                      final values = entry.value;
-
-                      if (values.isNotEmpty) {
-                        if (values.first is TvShow) {
+                    // if (state.globalStatus == PlexStatus.loading)
+                    //   LinearProgressIndicator(
+                    //     color: Colors.orange,
+                    //     backgroundColor: Colors.orange.withOpacity(0.3),
+                    //   ),
+                    ...state.media.map((library) {
+                      if (library.items.isEmpty) {
+                        return MediaView(
+                            name: library.name,
+                            media: library.items,
+                            status: library.status);
+                      } else {
+                        if (library.items.first is TvShow) {
                           return TvView(
-                            tvShows: values.cast<TvShow>().toList(),
-                            status: state.status,
+                            tvShows: library.items.cast<TvShow>().toList(),
+                            status: library.status,
                           );
                         } else {
                           return MediaView(
-                            name: key,
-                            media: values,
-                            status: state.status,
+                            name: library.name,
+                            media: library.items,
+                            status: library.status,
                           );
                         }
                       }
-                      return const SizedBox();
                     }).toList(),
-                    ...state.messages.map((e) => Text(e)),
                   ],
                 );
               },

@@ -27,35 +27,30 @@ class _PlexApi {
     return libraries;
   }
 
-  Future<Map<String, List<Media>>> getEverything(
-      Map<String, String> libraries, String ipAddress, int port) async {
-    Map<String, List<Media>> media = {};
-    for (final library in libraries.entries) {
-      final type = await _extractType(library.key, ipAddress, port);
-      if (type == "movie") {
-        List<Movie> movies = await getMovies(library.key, ipAddress, port);
-        if (movies.isNotEmpty) {
-          media.putIfAbsent(library.value, () => movies);
-
-          updateStatus("${library.value}: Found ${movies.length} Movies");
-          continue;
-        }
-      } else if (type == "show") {
-        final tv = await getTvShows(library.key, ipAddress, port);
-        if (tv.isNotEmpty) {
-          media.putIfAbsent(library.value, () => tv);
-          updateStatus("${library.value}: Found ${tv.length} TV Shows");
-          continue;
-        }
-      } else if (type == "photo") {
-        continue;
-      } else {
-        continue;
+  Future<List<Media>> getMedia(PlexLibrary library, String ip, int port) async {
+    final type = await _extractType(library.id, ip, port);
+    if (type == "movie") {
+      List<Movie> movies = await getMovies(library.id, ip, port);
+      if (movies.isNotEmpty) {
+        return movies;
       }
-      updateStatus("${library.key} Finished");
+    } else if (type == "show") {
+      final tv = await getTvShows(library.id, ip, port);
+      if (tv.isNotEmpty) {
+        return tv;
+      }
     }
-    return media;
+    return [];
   }
+
+  // Future<Map<String, List<Media>>> getEverything(
+  //     Map<String, String> libraries, String ipAddress, int port) async {
+  //   Map<String, List<Media>> media = {};
+  //   for (final library in libraries.entries) {
+  //     getMedia(library, ipAddress, port);
+  //   }
+  //   return media;
+  // }
 
   Future<String?> _extractType(String key, String ip, int port) async {
     final url = Uri.parse(

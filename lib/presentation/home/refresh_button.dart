@@ -25,7 +25,7 @@ class RefreshButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool showConnect = state.media.values.toList().isEmpty;
+    bool showConnect = state.media.isEmpty;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -36,12 +36,12 @@ class RefreshButton extends StatelessWidget {
         opacity: ip.isEmpty || port.isEmpty ? 0.2 : 1.0,
         child: Stack(
           children: [
-            if (state.status == PlexStatus.loading)
-              const Positioned.fill(
-                child: CircularProgressIndicator(
-                  color: Colors.orange,
-                ),
-              ),
+            // if (state.status == PlexStatus.loading)
+            //   const Positioned.fill(
+            //     child: CircularProgressIndicator(
+            //       color: Colors.orange,
+            //     ),
+            //   ),
             Container(
               width: 45,
               height: 45,
