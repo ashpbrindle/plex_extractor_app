@@ -36,12 +36,12 @@ class RefreshButton extends StatelessWidget {
         opacity: ip.isEmpty || port.isEmpty ? 0.2 : 1.0,
         child: Stack(
           children: [
-            // if (state.status == PlexStatus.loading)
-            //   const Positioned.fill(
-            //     child: CircularProgressIndicator(
-            //       color: Colors.orange,
-            //     ),
-            //   ),
+            if (state.globalStatus == PlexStatus.loading)
+              const Positioned.fill(
+                child: CircularProgressIndicator(
+                  color: Colors.orange,
+                ),
+              ),
             Container(
               width: 45,
               height: 45,

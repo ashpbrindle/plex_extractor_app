@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/presentation/tv/tv_season_item.dart';

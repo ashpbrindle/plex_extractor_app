@@ -1,9 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
-import 'dart:ui';
-
-import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:plex_extractor_app/api/plex/plex_repository.dart';

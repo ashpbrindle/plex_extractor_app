@@ -29,16 +29,11 @@ class _PlexApi {
 
   Future<List<Media>> getMedia(PlexLibrary library, String ip, int port) async {
     final type = await _extractType(library.id, ip, port);
-    if (type == "movie") {
-      List<Movie> movies = await getMovies(library.id, ip, port);
-      if (movies.isNotEmpty) {
-        return movies;
-      }
-    } else if (type == "show") {
-      final tv = await getTvShows(library.id, ip, port);
-      if (tv.isNotEmpty) {
-        return tv;
-      }
+    switch (type) {
+      case "movie":
+        return await getMovies(library.id, ip, port);
+      case "show":
+        return await getTvShows(library.id, ip, port);
     }
     return [];
   }

@@ -14,14 +14,6 @@ part 'plex_api.dart';
 
 class PlexRepository {
   final plex = _PlexApi();
-  // Future<Map<String, List<Media>>> extractEverything(
-  //   String ip,
-  //   int port, {
-  //   required Map<String, String> libraries,
-  // }) async {
-  //   // {Library, List<Media>}
-  //   return plex.getEverything(libraries, ip, port);
-  // }
 
   Future<List<Media>> getMedia(
     String ip,
