@@ -1,6 +1,14 @@
-part of plex;
+import 'dart:ui';
 
-class _PlexApi {
+import 'package:collection/collection.dart';
+import 'package:http/http.dart' as http;
+import 'package:plex_extractor_app/models/media.dart';
+import 'package:plex_extractor_app/models/movie.dart';
+import 'package:plex_extractor_app/models/tv_show.dart';
+import 'package:plex_extractor_app/viewmodels/plex_library.dart';
+import 'package:xml/xml.dart';
+
+class PlexApi {
   static const plexToken = "4uMqH75fXVvnEQ_yJZ6A";
 
   /// Returns a map of id's and their paths
@@ -11,7 +19,6 @@ class _PlexApi {
         'http://$ipAddress:32400/library/sections/?X-Plex-Token=$plexToken');
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
-    // log.debug('...');(document);
     final directories = document.findAllElements('Directory');
     for (final directory in directories) {
       final key = directory.attributes
@@ -59,7 +66,7 @@ class _PlexApi {
       viewGroup = container.attributes
           .firstWhereOrNull((p0) => p0.name.local.contains("viewGroup"))
           ?.value;
-      if (viewGroup != null) break;
+      break;
     }
     return viewGroup;
   }

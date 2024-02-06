@@ -2,13 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
-import 'package:plex_extractor_app/presentation/home/media_view.dart';
-import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
 import 'package:plex_extractor_app/presentation/home/selection_drawer.dart';
-import 'package:plex_extractor_app/presentation/home/status_view.dart';
 import 'package:plex_extractor_app/presentation/home/text_input.dart';
-import 'package:plex_extractor_app/presentation/home/tv_view.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
 import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
@@ -77,11 +72,24 @@ class _HomeState extends State<Home> {
                                         child: Center(
                                           child: Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              e.name,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                              ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  e.name,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  e.items.length.toString(),
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
