@@ -3,12 +3,12 @@ import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
 class PlexLibrary extends Equatable {
+  List<Media> items;
   final String name;
   final String id;
-  final List<Media> items;
   final PlexStatus status;
 
-  const PlexLibrary({
+  PlexLibrary({
     required this.name,
     required this.id,
     required this.items,

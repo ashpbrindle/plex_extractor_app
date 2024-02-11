@@ -82,9 +82,20 @@ class PlexApi {
     final document = XmlDocument.parse(response.body);
     final videos = document.findAllElements('Video');
     for (var video in videos) {
+      final media = video.findAllElements('Media');
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
           .value;
+      final resolution = media.first.attributes
+          .firstWhereOrNull(
+              (element) => element.name.local.contains("videoResolution"))
+          ?.value;
+      // final width = media.first.attributes
+      //     .firstWhereOrNull((element) => element.name.local.contains("width"))
+      //     ?.value;
+      // final height = media.first.attributes
+      //     .firstWhereOrNull((element) => element.name.local.contains("height"))
+      //     ?.value;
       var year = video.attributes
           .firstWhere((p0) => p0.name.local.contains("year"))
           .value;
@@ -93,6 +104,7 @@ class PlexApi {
           name: title,
           year: year,
           type: "movie",
+          resolution: resolution,
         ),
       );
     }
@@ -181,11 +193,19 @@ class PlexApi {
     final document = XmlDocument.parse(response.body);
     final videos = document.findAllElements('Video');
     for (var video in videos) {
+      final media = video.findAllElements('Media');
+      final resolution = media.first.attributes
+          .firstWhereOrNull(
+              (element) => element.name.local.contains("videoResolution"))
+          ?.value;
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
           .value;
       episodes.add(
-        TvShowEpisode(title),
+        TvShowEpisode(
+          name: title,
+          resolution: resolution,
+        ),
       );
     }
     return episodes;
