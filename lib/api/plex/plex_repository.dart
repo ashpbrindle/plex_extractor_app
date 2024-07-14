@@ -18,19 +18,22 @@ class PlexRepository {
 
   Future<List<Media>> getMedia(
     String ip,
-    int port, {
+    String port,
+    String token, {
     required PlexLibrary media,
   }) {
-    return api.getMedia(media, ip, port);
+    return api.getMedia(media, ip, port, token);
   }
 
-  Future<Map<String, String>> getLibraries(String ip, int port) async =>
-      api.getLibraries(ip);
+  Future<Map<String, String>> getLibraries(
+          String ip, String port, String token) async =>
+      api.getLibraries(ip, port, token);
 
   Future<void> saveMedia({
     required List<PlexLibrary> medias,
     required String recentIp,
-    required int recentPort,
+    required String recentPort,
+    required String recentToken,
     String? lastSave,
   }) async {
     final SharedPreferences prefs = await sharedPreferences;
@@ -43,16 +46,17 @@ class PlexRepository {
         full = "$full;${media.name},${jsonEncode(media.items)}";
       }
     }
-    if (lastSave != null) await prefs.setString(SavedValues.date.key, lastSave);
-    await prefs.setString(SavedValues.media.key, full);
-    await prefs.setString(SavedValues.ip.key, recentIp);
-    await prefs.setInt(SavedValues.port.key, recentPort);
+    if (lastSave != null) await prefs.setString(SavedValue.date.key, lastSave);
+    await prefs.setString(SavedValue.media.key, full);
+    await prefs.setString(SavedValue.ip.key, recentIp);
+    await prefs.setString(SavedValue.port.key, recentPort);
+    await prefs.setString(SavedValue.token.key, recentToken);
   }
 
   Future<(List<PlexLibrary> media, String? save)> retrieveSavedMedia() async {
     final SharedPreferences prefs = await sharedPreferences;
-    final medias = prefs.getString(SavedValues.media.key)?.split(";");
-    final lastSave = prefs.getString(SavedValues.date.key);
+    final medias = prefs.getString(SavedValue.media.key)?.split(";");
+    final lastSave = prefs.getString(SavedValue.date.key);
     Map<String, List<Media>> extractedMedia = {};
     if (medias != null) {
       for (final media in medias) {
@@ -92,14 +96,22 @@ class PlexRepository {
       lastSave
     );
   }
+
+  Future<String?> get recentIp =>
+      sharedPreferences.then((prefs) => prefs.getString(SavedValue.ip.key));
+  Future<String?> get recentPort =>
+      sharedPreferences.then((prefs) => prefs.getString(SavedValue.port.key));
+  Future<String?> get recentToken =>
+      sharedPreferences.then((prefs) => prefs.getString(SavedValue.token.key));
 }
 
-enum SavedValues {
+enum SavedValue {
   media("media"),
   date("lastSave"),
   ip("recentIp"),
-  port("recentPort");
+  port("recentPort"),
+  token("token");
 
-  const SavedValues(this.key);
+  const SavedValue(this.key);
   final String key;
 }

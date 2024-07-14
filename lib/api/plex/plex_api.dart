@@ -9,14 +9,15 @@ import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 import 'package:xml/xml.dart';
 
 class PlexApi {
-  static const plexToken = "4uMqH75fXVvnEQ_yJZ6A";
+  // static const plexToken = "4uMqH75fXVvnEQ_yJZ6A";
 
   /// Returns a map of id's and their paths
-  Future<Map<String, String>> getLibraries(String ipAddress) async {
-    //http://[IP address]:32400/library/sections/?X-Plex-Token=[PlexToken]
+  Future<Map<String, String>> getLibraries(
+      String ipAddress, String port, String plexToken) async {
+    //http://[ipAddresss]:[port]/library/sections/?X-Plex-Token=[PlexToken]
     Map<String, String> libraries = {};
     final url = Uri.parse(
-        'http://$ipAddress:32400/library/sections/?X-Plex-Token=$plexToken');
+        'http://$ipAddress:$port/library/sections/?X-Plex-Token=$plexToken');
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
     final directories = document.findAllElements('Directory');
@@ -34,19 +35,20 @@ class PlexApi {
     return libraries;
   }
 
-  Future<List<Media>> getMedia(PlexLibrary library, String ip, int port) async {
-    final type = await _extractType(library.id, ip, port);
+  Future<List<Media>> getMedia(
+      PlexLibrary library, String ip, String port, String plexToken) async {
+    final type = await _extractType(library.id, ip, port, plexToken);
     switch (type) {
       case "movie":
-        return await getMovies(library.id, ip, port);
+        return await getMovies(library.id, ip, port, plexToken);
       case "show":
-        return await getTvShows(library.id, ip, port);
+        return await getTvShows(library.id, ip, port, plexToken);
     }
     return [];
   }
 
   // Future<Map<String, List<Media>>> getEverything(
-  //     Map<String, String> libraries, String ipAddress, int port) async {
+  //     Map<String, String> libraries, String ipAddress, String port) async {
   //   Map<String, List<Media>> media = {};
   //   for (final library in libraries.entries) {
   //     getMedia(library, ipAddress, port);
@@ -54,7 +56,8 @@ class PlexApi {
   //   return media;
   // }
 
-  Future<String?> _extractType(String key, String ip, int port) async {
+  Future<String?> _extractType(
+      String key, String ip, String port, String plexToken) async {
     final url = Uri.parse(
       'http://$ip:$port/library/sections/$key/all?X-Plex-Token=$plexToken&',
     );
@@ -72,7 +75,7 @@ class PlexApi {
   }
 
   Future<List<Movie>> getMovies(
-      String libraryId, String ipAddress, int port) async {
+      String libraryId, String ipAddress, String port, String plexToken) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
     List<Movie> movies = [];
     final url = Uri.parse(
@@ -112,7 +115,7 @@ class PlexApi {
   }
 
   Future<List<TvShow>> getTvShows(
-      String libraryId, String ipAddress, int port) async {
+      String libraryId, String ipAddress, String port, String plexToken) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
     List<TvShow> tvShows = [];
     final url = Uri.parse(
@@ -138,7 +141,8 @@ class PlexApi {
       tvShows.add(
         TvShow(
           name: title,
-          seasons: await _getTvShowSeasons(ratingKey, ipAddress),
+          seasons:
+              await _getTvShowSeasons(ratingKey, ipAddress, port, plexToken),
           year: year ?? 'Year Not Found',
           type: 'tvShow',
         ),
@@ -148,12 +152,10 @@ class PlexApi {
   }
 
   Future<List<TvShowSeason>> _getTvShowSeasons(
-    String id,
-    String ip,
-  ) async {
+      String id, String ip, String port, String plexToken) async {
     List<TvShowSeason> seasons = [];
     final url = Uri.parse(
-      'http://$ip:32400/library/metadata/$id/children?X-Plex-Token=$plexToken',
+      'http://$ip:$port/library/metadata/$id/children?X-Plex-Token=$plexToken',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
@@ -173,7 +175,7 @@ class PlexApi {
         seasons.add(
           TvShowSeason(
             name: name,
-            episodes: await _getTvShowEpisodes(ratingKey, ip),
+            episodes: await _getTvShowEpisodes(ratingKey, ip, port, plexToken),
           ),
         );
       } catch (e) {}
@@ -184,10 +186,12 @@ class PlexApi {
   Future<List<TvShowEpisode>> _getTvShowEpisodes(
     String id,
     String ip,
+    String port,
+    String plexToken,
   ) async {
     List<TvShowEpisode> episodes = [];
     final url = Uri.parse(
-      'http://$ip:32400/library/metadata/$id/children?X-Plex-Token=$plexToken',
+      'http://$ip:$port/library/metadata/$id/children?X-Plex-Token=$plexToken',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);

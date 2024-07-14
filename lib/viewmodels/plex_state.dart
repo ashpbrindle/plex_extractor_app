@@ -4,7 +4,8 @@ import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 class PlexState extends Equatable {
   final List<PlexLibrary> media;
   final String? recentIp;
-  final int? recentPort;
+  final String? recentPort;
+  final String? recentToken;
   final String? error;
   final String? lastSaved;
   final PlexStatus globalStatus;
@@ -12,6 +13,7 @@ class PlexState extends Equatable {
   const PlexState({
     required this.recentIp,
     required this.recentPort,
+    required this.recentToken,
     required this.media,
     required this.lastSaved,
     required this.globalStatus,
@@ -23,13 +25,15 @@ class PlexState extends Equatable {
         media = [],
         recentIp = null,
         recentPort = null,
+        recentToken = null,
         error = null,
         globalStatus = PlexStatus.init;
 
   PlexState copyWith({
     List<PlexLibrary>? media,
     String? recentIp,
-    int? recentPort,
+    String? recentPort,
+    String? recentToken,
     String? error,
     String? lastSaved,
     PlexStatus? globalStatus,
@@ -37,6 +41,7 @@ class PlexState extends Equatable {
     return PlexState(
       recentIp: recentIp ?? this.recentIp,
       recentPort: recentPort ?? this.recentPort,
+      recentToken: recentToken ?? this.recentToken,
       error: error ?? this.error,
       media: media ?? this.media,
       globalStatus: globalStatus ?? this.globalStatus,
@@ -49,6 +54,7 @@ class PlexState extends Equatable {
         media,
         recentIp,
         recentPort,
+        recentToken,
         lastSaved,
         error,
       ];
