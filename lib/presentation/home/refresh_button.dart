@@ -9,6 +9,7 @@ class RefreshButton extends StatelessWidget {
     super.key,
     required this.ip,
     required this.port,
+    required this.token,
     this.movies1Path,
     this.movies2Path,
     this.tv1Path,
@@ -18,6 +19,7 @@ class RefreshButton extends StatelessWidget {
   final PlexState state;
   final String ip;
   final String port;
+  final String token;
   final String? movies1Path;
   final String? movies2Path;
   final String? tv1Path;
@@ -25,18 +27,18 @@ class RefreshButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool showConnect = state.media.values.toList().isEmpty;
+    bool showConnect = state.media.isEmpty;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (ip.isEmpty || port.isEmpty) return;
-        return context.read<PlexCubit>().extractMedia(ip, int.parse(port));
+        if (ip.isEmpty || port.isEmpty || token.isEmpty) return;
+        return context.read<PlexCubit>().extractMedia(ip, port, token);
       },
       child: Opacity(
         opacity: ip.isEmpty || port.isEmpty ? 0.2 : 1.0,
         child: Stack(
           children: [
-            if (state.status == PlexStatus.loading)
+            if (state.globalStatus == PlexStatus.loading)
               const Positioned.fill(
                 child: CircularProgressIndicator(
                   color: Colors.orange,

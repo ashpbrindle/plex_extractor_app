@@ -80,11 +80,11 @@ class TvView extends StatelessWidget {
                   .toList(),
           ],
         ),
-        // if (status == PlexStatus.loading)
-        //   LinearProgressIndicator(
-        //     color: Colors.orange,
-        //     backgroundColor: Colors.orange.withOpacity(0.3),
-        //   )
+        if (status == PlexStatus.loading)
+          LinearProgressIndicator(
+            color: Colors.orange,
+            backgroundColor: Colors.orange.withOpacity(0.3),
+          )
       ],
     );
   }

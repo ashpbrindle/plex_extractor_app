@@ -1,153 +1,135 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:isolate';
-import 'dart:ui';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:plex_extractor_app/api/plex/plex_repository.dart';
-import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/models/movie.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
+import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PlexCubit extends Cubit<PlexState> {
   PlexCubit({
     required PlexRepository plexRepository,
   })  : _plexRepository = plexRepository,
         super(PlexState.init()) {
-    init();
-  }
-  ReceivePort receivePort = ReceivePort();
-
-  Future<void> init() async {
-    prefs = await SharedPreferences.getInstance();
-    IsolateNameServer.registerPortWithName(
-      receivePort.sendPort,
-      "messages",
-    );
-
-    receivePort.listen((message) {
-      print(message);
-      var newMessages = state.messages;
-      newMessages.add(message);
-      emit(state.copyWith(messages: newMessages));
-    });
-
-    await getSavedMedia();
+    getSavedMedia();
   }
 
   final PlexRepository _plexRepository;
-  late SharedPreferences prefs;
 
   Future<void> getSavedMedia() async {
-    final medias = prefs.getString('media')?.split(";");
-    final lastSave = prefs.getString("lastSave");
-    Map<String, List<Media>> extractedMedia = {};
-    if (medias != null) {
-      for (final media in medias) {
-        List<Movie> extractedMovies = [];
-        List<TvShow> extractedTv = [];
-        final temp = media.split(",");
-        final name = temp.first;
-        final listOfMedias = temp.sublist(1).join(",");
-        if (listOfMedias.contains('"type":"movie"')) {
-          final movies = jsonDecode(listOfMedias);
-          for (var movie in movies) {
-            extractedMovies.add(Movie.fromJson(movie));
-          }
-          extractedMedia.putIfAbsent(name, () => extractedMovies);
-        } else if (listOfMedias.contains('"type":"tvShow"')) {
-          final shows = jsonDecode(listOfMedias);
-          for (var show in shows) {
-            extractedTv.add(TvShow.fromJson(show));
-          }
-          extractedMedia.putIfAbsent(name, () => extractedTv);
-        }
-      }
-    }
+    final (List<PlexLibrary> media, String? lastSave) =
+        await _plexRepository.retrieveSavedMedia();
+    emit(
+      state.copyWith(
+        media: media,
+        globalStatus: PlexStatus.loaded,
+        error: null,
+        lastSaved: lastSave,
+      ),
+    );
+  }
 
-    if (extractedMedia.isEmpty) {
+  void extractMedia(String ip, String port, String token) async {
+    _moveLibrariesToLoading(ip, port, token);
+    await _retrieveNewMedia(ip, port, token);
+    final libraries = state.media;
+    String? lastSuccessfulDate;
+    for (final library in libraries) {
+      print("Attempting to Extract ${library.name}");
+      lastSuccessfulDate =
+          await _populateLibrary(ip, port, token, library: library);
+      print(
+        "Extracted ${library.name} ${state.media.firstWhere(
+          (element) => element.id == library.id,
+        )}",
+      );
+    }
+    if (lastSuccessfulDate != null) {
+      _plexRepository.saveMedia(
+        medias: state.media,
+        recentIp: ip,
+        recentPort: port,
+        recentToken: token,
+        lastSave: lastSuccessfulDate,
+      );
       emit(
         state.copyWith(
-          media: {},
-          status: PlexStatus.error,
-          error: "Failed to fetch saved media. Please Connect",
+          globalStatus: PlexStatus.loaded,
+          lastSaved: lastSuccessfulDate,
         ),
       );
     } else {
+      getSavedMedia();
+    }
+  }
+
+  Future<String?> _populateLibrary(
+    String ip,
+    String port,
+    String plexToken, {
+    required PlexLibrary library,
+  }) async {
+    List<PlexLibrary> newMedia = [...state.media];
+    final index = newMedia.indexWhere((element) => element.id == library.id);
+    try {
+      final items =
+          await _plexRepository.getMedia(ip, port, plexToken, media: library);
+      newMedia[index] =
+          library.copyWith(items: items, status: PlexStatus.loaded);
+      emit(state.copyWith(media: [...newMedia]));
+      return DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+    } catch (e) {
+      newMedia[index] = library.copyWith(items: [], status: PlexStatus.error);
+      emit(state.copyWith(media: [...newMedia]));
+      return null;
+    }
+  }
+
+  Future<void> _retrieveNewMedia(String ip, String port, String token) async {
+    try {
+      final libraries = await _plexRepository.getLibraries(ip, port, token);
+      List<PlexLibrary> plexLibraries = [];
+      libraries.forEach(
+        (id, name) => plexLibraries.add(
+          PlexLibrary(
+            name: name,
+            id: id,
+            items: const [],
+            status: PlexStatus.loading,
+          ),
+        ),
+      );
+      emit(state.copyWith(media: [...plexLibraries]));
+      print("Found ${state.media.map((e) => e.name)}");
+    } catch (e) {
+      List<PlexLibrary> newMedia = [...state.media];
+      for (int i = 0; i < newMedia.length; i++) {
+        newMedia[i] = newMedia[i].copyWith(status: PlexStatus.error);
+      }
       emit(
         state.copyWith(
-          media: extractedMedia,
-          status: PlexStatus.loaded,
-          error: null,
-          lastSaved: lastSave,
+          globalStatus: PlexStatus.error,
+          error: "$e",
+          media: [...newMedia],
         ),
       );
     }
   }
 
-  String get recentIp => prefs.getString('recentIp') ?? "";
-  int? get recentPort => prefs.getInt('recentPort');
-
-  void extractMedia(String ip, int port) async {
-    emit(state.copyWith(status: PlexStatus.loading, messages: []));
+  void _moveLibrariesToLoading(String ip, String port, String token) {
+    List<PlexLibrary> library = [];
+    for (var element in state.media) {
+      library.add(element.copyWith(status: PlexStatus.loading));
+    }
     emit(
-      state.copyWith(
-        recentIp: recentIp,
-        recentPort: recentPort,
+      PlexState(
+        recentIp: ip,
+        recentPort: port,
+        recentToken: token,
+        media: library,
+        lastSaved: state.lastSaved,
+        globalStatus: PlexStatus.loading,
         error: null,
       ),
     );
-    Map<String, List<Media>>? media;
-    String lastSuccessfulDate = "";
-    try {
-      media = await _plexRepository.extractEverything(ip, port);
-      lastSuccessfulDate =
-          DateFormat('dd/MM/yyyy HH:MM').format(DateTime.now());
-      emit(
-        state.copyWith(
-          status: PlexStatus.loaded,
-          media: media,
-          lastSaved: lastSuccessfulDate,
-          error: null,
-        ),
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(
-            status: PlexStatus.error,
-            media: state.media,
-            error: "Error Extracting Movies from Plex,\n $e"),
-      );
-    }
-    _save(media ?? state.media, ip, port, lastSuccessfulDate);
-  }
-
-  Future<void> _save(
-    Map<String, List<Media>> media,
-    String recentIp,
-    int recentPort,
-    String? lastSave,
-  ) async {
-    String full = "";
-    for (var media in media.entries) {
-      if (full.isEmpty) {
-        full = "${media.key},${jsonEncode(media.value)}";
-      } else {
-        full = "$full;${media.key},${jsonEncode(media.value)}";
-      }
-    }
-    lastSave != null ? await prefs.setString('lastSaveMovie', lastSave) : null;
-    await prefs.setString('media', full);
-    await prefs.setString('recentIp', recentIp);
-    await prefs.setInt('recentPort', recentPort);
-  }
-
-  @override
-  Future<void> close() {
-    receivePort.drain();
-    return super.close();
   }
 }

@@ -28,13 +28,20 @@ class TvSeasonItem extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width / 1.5,
-                    child: Text(
-                      episode.name,
-                      style: style.copyWith(
-                          fontStyle: FontStyle.italic, fontSize: 15),
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        episode.name,
+                        style: style.copyWith(
+                            fontStyle: FontStyle.italic, fontSize: 12),
+                      ),
+                      Text(
+                        episode.resolution ?? "",
+                        style: style.copyWith(
+                            fontStyle: FontStyle.italic, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
               ),

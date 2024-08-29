@@ -1,60 +1,60 @@
 import 'package:equatable/equatable.dart';
-import 'package:plex_extractor_app/models/media.dart';
+import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 
 class PlexState extends Equatable {
-  final Map<String, List<Media>> media;
-  final PlexStatus status;
+  final List<PlexLibrary> media;
   final String? recentIp;
-  final int? recentPort;
+  final String? recentPort;
+  final String? recentToken;
   final String? error;
-  final List<String> messages;
   final String? lastSaved;
+  final PlexStatus globalStatus;
 
   const PlexState({
     required this.recentIp,
-    required this.messages,
     required this.recentPort,
+    required this.recentToken,
     required this.media,
-    required this.status,
     required this.lastSaved,
+    required this.globalStatus,
     this.error,
   });
 
   PlexState.init()
       : lastSaved = null,
-        status = PlexStatus.init,
-        messages = [],
-        media = {},
+        media = [],
         recentIp = null,
         recentPort = null,
-        error = null;
+        recentToken = null,
+        error = null,
+        globalStatus = PlexStatus.init;
 
   PlexState copyWith({
-    Map<String, List<Media>>? media,
-    PlexStatus? status,
-    List<String>? messages,
+    List<PlexLibrary>? media,
     String? recentIp,
-    int? recentPort,
+    String? recentPort,
+    String? recentToken,
     String? error,
     String? lastSaved,
+    PlexStatus? globalStatus,
   }) {
     return PlexState(
       recentIp: recentIp ?? this.recentIp,
-      messages: messages ?? this.messages,
       recentPort: recentPort ?? this.recentPort,
+      recentToken: recentToken ?? this.recentToken,
       error: error ?? this.error,
       media: media ?? this.media,
-      status: status ?? this.status,
+      globalStatus: globalStatus ?? this.globalStatus,
       lastSaved: lastSaved ?? this.lastSaved,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
         media,
         recentIp,
         recentPort,
+        recentToken,
         lastSaved,
         error,
       ];

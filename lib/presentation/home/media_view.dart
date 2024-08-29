@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/models/movie.dart';
-import 'package:plex_extractor_app/presentation/movie/movie_row_item.dart';
+import 'package:plex_extractor_app/presentation/movie/media_row_item.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
 class MediaView extends StatelessWidget {
@@ -88,11 +87,11 @@ class MediaView extends StatelessWidget {
                   .toList(),
           ],
         ),
-        // if (status == PlexStatus.loading)
-        //   LinearProgressIndicator(
-        //     color: Colors.orange,
-        //     backgroundColor: Colors.orange.withOpacity(0.3),
-        //   ),
+        if (status == PlexStatus.loading)
+          LinearProgressIndicator(
+            color: Colors.orange,
+            backgroundColor: Colors.orange.withOpacity(0.3),
+          ),
       ],
     );
   }
