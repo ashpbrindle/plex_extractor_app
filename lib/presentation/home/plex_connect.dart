@@ -79,6 +79,7 @@ class _PlexConnectState extends State<PlexConnect> {
                     ),
                     child: Center(
                       child: TextField(
+                        enabled: state.recentToken != null,
                         style: const TextStyle(fontSize: 12),
                         controller: controller,
                         decoration: const InputDecoration(
@@ -101,6 +102,7 @@ class _PlexConnectState extends State<PlexConnect> {
                     ),
                     child: Center(
                       child: TextField(
+                        enabled: state.recentToken != null,
                         style: const TextStyle(fontSize: 12),
                         keyboardType: TextInputType.number,
                         controller: portController,

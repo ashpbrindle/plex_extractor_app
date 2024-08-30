@@ -183,12 +183,7 @@ class PlexCubit extends Cubit<PlexState> {
   Future<void> logout() async {
     emit(state.copyWith(plexLoginStatus: PlexLoginStatus.loading));
     _plexRepository.logout();
-    emit(
-      state.copyWith(
-        recentToken: null,
-        plexLoginStatus: PlexLoginStatus.noAuthToken,
-      ),
-    );
+    emit(state.resetToken());
   }
 
   void _moveLibrariesToLoading(String ip, String port) {

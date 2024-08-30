@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:plex_extractor_app/presentation/home/login_bottom_sheet.dart';
+import 'package:plex_extractor_app/presentation/home/login_button.dart';
 import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
 import 'package:plex_extractor_app/presentation/home/status_view.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
@@ -29,29 +30,9 @@ class SelectionDrawer extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (state.recentToken != null) {
-                            context.read<PlexCubit>().logout();
-                          } else {
-                            showModalBottomSheet(
-                              isScrollControlled: true,
-                              context: context,
-                              builder: (context) => LoginBottomSheet(
-                                login:
-                                    (String username, String password) async {
-                                  await context
-                                      .read<PlexCubit>()
-                                      .login(username, password);
-                                },
-                                loading: state.plexLoginStatus ==
-                                    PlexLoginStatus.loading,
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(
-                            state.recentToken != null ? "Logout" : "Login"),
+                      LoginButton(
+                        token: state.recentToken,
+                        loginStatus: state.plexLoginStatus,
                       ),
                       const SizedBox(
                         height: 10,
@@ -63,14 +44,18 @@ class SelectionDrawer extends StatelessWidget {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 20),
-                          child: Text(
-                            state.lastSaved != null
-                                ? "${state.lastSaved}"
-                                : "N/A",
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w300),
+                            vertical: 5,
+                            horizontal: 20,
+                          ),
+                          child: Center(
+                            child: Text(
+                              state.lastSaved != null
+                                  ? "${state.lastSaved}"
+                                  : "N/A",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w300),
+                            ),
                           ),
                         ),
                       ),
