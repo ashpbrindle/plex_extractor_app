@@ -9,16 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PlexConnect extends StatefulWidget {
   const PlexConnect({
     super.key,
-    this.movies1Path,
-    this.movies2Path,
-    this.tv1Path,
-    this.tv2Path,
   });
-
-  final String? movies1Path;
-  final String? movies2Path;
-  final String? tv1Path;
-  final String? tv2Path;
 
   @override
   State<PlexConnect> createState() => _PlexConnectState();
@@ -79,7 +70,7 @@ class _PlexConnectState extends State<PlexConnect> {
                     ),
                     child: Center(
                       child: TextField(
-                        enabled: state.recentToken != null,
+                        enabled: state.credentials.authToken != null,
                         style: const TextStyle(fontSize: 12),
                         controller: controller,
                         decoration: const InputDecoration(
@@ -102,7 +93,7 @@ class _PlexConnectState extends State<PlexConnect> {
                     ),
                     child: Center(
                       child: TextField(
-                        enabled: state.recentToken != null,
+                        enabled: state.credentials.authToken != null,
                         style: const TextStyle(fontSize: 12),
                         keyboardType: TextInputType.number,
                         controller: portController,
@@ -127,10 +118,6 @@ class _PlexConnectState extends State<PlexConnect> {
               state,
               ip: controller.text,
               port: portController.text,
-              movies1Path: widget.movies1Path,
-              movies2Path: widget.movies2Path,
-              tv1Path: widget.tv1Path,
-              tv2Path: widget.tv2Path,
             )
           ],
         );

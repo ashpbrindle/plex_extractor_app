@@ -9,19 +9,11 @@ class RefreshButton extends StatelessWidget {
     super.key,
     required this.ip,
     required this.port,
-    this.movies1Path,
-    this.movies2Path,
-    this.tv1Path,
-    this.tv2Path,
   });
 
   final PlexState state;
   final String ip;
   final String port;
-  final String? movies1Path;
-  final String? movies2Path;
-  final String? tv1Path;
-  final String? tv2Path;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +21,9 @@ class RefreshButton extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (ip.isEmpty || port.isEmpty) return;
+        if (ip.isEmpty || port.isEmpty || state.credentials.authToken == null) {
+          return;
+        }
         return context.read<PlexCubit>().extractMedia(ip, port);
       },
       child: Opacity(
@@ -46,7 +40,9 @@ class RefreshButton extends StatelessWidget {
               width: 45,
               height: 45,
               decoration: BoxDecoration(
-                color: ip.isEmpty || port.isEmpty
+                color: ip.isEmpty ||
+                        port.isEmpty ||
+                        state.credentials.authToken == null
                     ? Colors.grey
                     : (showConnect ? Colors.green : Colors.purple),
                 borderRadius: const BorderRadius.all(
@@ -58,7 +54,9 @@ class RefreshButton extends StatelessWidget {
                 child: Center(
                   child: Icon(
                     showConnect ? Icons.cloud_download : Icons.sync,
-                    color: ip.isEmpty || port.isEmpty
+                    color: ip.isEmpty ||
+                            port.isEmpty ||
+                            state.credentials.authToken == null
                         ? Colors.blueGrey
                         : Colors.white,
                   ),

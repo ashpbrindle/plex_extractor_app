@@ -8,7 +8,7 @@ class LoginBottomSheet extends StatefulWidget {
     required this.savedUsername,
   });
 
-  final Function(String username, String password) login;
+  final Future<bool> Function(String username, String password) login;
   final bool loading;
   final String? savedUsername;
 
@@ -19,6 +19,10 @@ class LoginBottomSheet extends StatefulWidget {
 class _LoginBottomSheetState extends State<LoginBottomSheet> {
   late TextEditingController username;
   late TextEditingController password;
+
+  bool errorOccured = false;
+  bool loading = false;
+  bool passwordVisible = false;
 
   @override
   void initState() {
@@ -58,22 +62,67 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             controller: username,
             obscureText: false,
           ),
-          TextField(
-            decoration: InputDecoration(labelText: 'Password'),
-            autocorrect: false,
-            controller: password,
-            obscureText: true,
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(labelText: 'Password'),
+                  autocorrect: false,
+                  controller: password,
+                  obscureText: !passwordVisible,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    passwordVisible = !passwordVisible;
+                  });
+                },
+                child: Icon(
+                  passwordVisible ? Icons.visibility_off : Icons.visibility,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
+          if (loading) ...[
+            const SizedBox(
+              width: 15,
+              height: 15,
+              child: CircularProgressIndicator(),
+            ),
+            const SizedBox(height: 20),
+          ],
+          if (errorOccured) ...[
+            const Text(
+              'Invalid Credentials, try again',
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
           ElevatedButton(
             style: ButtonStyle(
                 backgroundColor:
-                    enabled ? null : WidgetStateProperty.all(Colors.grey)),
+                    enabled ? null : const WidgetStatePropertyAll(Colors.grey)),
             onPressed: enabled
                 ? () {
                     if (enabled) {
-                      widget.login(username.text, password.text);
-                      Navigator.pop(context);
+                      setState(() {
+                        loading = true;
+                        errorOccured = false;
+                      });
+                      widget.login(username.text, password.text).then(
+                            (success) => success
+                                ? Navigator.pop(context)
+                                : setState(
+                                    () {
+                                      errorOccured = true;
+                                      loading = false;
+                                    },
+                                  ),
+                          );
                     }
                   }
                 : null,

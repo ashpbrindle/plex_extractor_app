@@ -16,7 +16,7 @@ void main() {
               api: PlexApi(),
               sharedPreferences: SharedPreferences.getInstance(),
             ),
-          ),
+          )..init(),
         )
       ],
       child: const Home(),

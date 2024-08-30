@@ -39,6 +39,7 @@ class PlexRepository {
     if (token != null) {
       final SharedPreferences prefs = await sharedPreferences;
       await prefs.setString(SavedValue.username.key, username);
+      await prefs.setString(SavedValue.token.key, token);
     }
     return token;
   }
@@ -54,9 +55,6 @@ class PlexRepository {
 
   Future<void> saveMedia({
     required List<PlexLibrary> medias,
-    required String recentIp,
-    required String recentPort,
-    required String recentToken,
     String? lastSave,
   }) async {
     final SharedPreferences prefs = await sharedPreferences;
@@ -71,6 +69,14 @@ class PlexRepository {
     }
     if (lastSave != null) await prefs.setString(SavedValue.date.key, lastSave);
     await prefs.setString(SavedValue.media.key, full);
+  }
+
+  Future<void> saveCredentials({
+    required String recentIp,
+    required String recentPort,
+    required String recentToken,
+  }) async {
+    final SharedPreferences prefs = await sharedPreferences;
     await prefs.setString(SavedValue.ip.key, recentIp);
     await prefs.setString(SavedValue.port.key, recentPort);
     await prefs.setString(SavedValue.token.key, recentToken);

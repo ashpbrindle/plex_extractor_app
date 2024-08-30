@@ -30,9 +30,10 @@ class LoginButton extends StatelessWidget {
             context: context,
             builder: (context) => LoginBottomSheet(
               savedUsername: savedUsername,
-              login: (String username, String password) async {
-                await context.read<PlexCubit>().login(username, password);
-              },
+              login: context.read<PlexCubit>().login,
+              // (String username, String password) async {
+              //   await context.read<PlexCubit>().login(username, password);
+              // },
               loading: loginStatus == PlexLoginStatus.loading,
             ),
           );

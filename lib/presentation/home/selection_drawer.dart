@@ -31,9 +31,9 @@ class SelectionDrawer extends StatelessWidget {
                         height: 10,
                       ),
                       LoginButton(
-                        token: state.recentToken,
+                        token: state.credentials.authToken,
                         loginStatus: state.plexLoginStatus,
-                        savedUsername: state.savedUsername,
+                        savedUsername: state.credentials.username,
                       ),
                       const SizedBox(
                         height: 10,
