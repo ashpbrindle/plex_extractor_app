@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:plex_extractor_app/presentation/home/login_bottom_sheet.dart';
 import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
 import 'package:plex_extractor_app/presentation/home/status_view.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
@@ -25,6 +26,33 @@ class SelectionDrawer extends StatelessWidget {
                     children: [
                       const SizedBox(height: 50),
                       const PlexConnect(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (state.recentToken != null) {
+                            context.read<PlexCubit>().logout();
+                          } else {
+                            showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (context) => LoginBottomSheet(
+                                login:
+                                    (String username, String password) async {
+                                  await context
+                                      .read<PlexCubit>()
+                                      .login(username, password);
+                                },
+                                loading: state.plexLoginStatus ==
+                                    PlexLoginStatus.loading,
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                            state.recentToken != null ? "Logout" : "Login"),
+                      ),
                       const SizedBox(
                         height: 10,
                       ),

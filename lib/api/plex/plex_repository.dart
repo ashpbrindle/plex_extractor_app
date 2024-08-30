@@ -25,6 +25,20 @@ class PlexRepository {
     return api.getMedia(media, ip, port, token);
   }
 
+  Future<String?> login({
+    required String username,
+    required String password,
+  }) =>
+      api.login(
+        username: username,
+        password: password,
+      );
+
+  Future<void> logout() async {
+    final prefs = await sharedPreferences;
+    prefs.remove(SavedValue.token.key);
+  }
+
   Future<Map<String, String>> getLibraries(
           String ip, String port, String token) async =>
       api.getLibraries(ip, port, token);

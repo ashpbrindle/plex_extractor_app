@@ -27,7 +27,6 @@ class PlexConnect extends StatefulWidget {
 class _PlexConnectState extends State<PlexConnect> {
   final TextEditingController controller = TextEditingController();
   final TextEditingController portController = TextEditingController();
-  final TextEditingController tokenController = TextEditingController();
 
   @override
   void initState() {
@@ -35,19 +34,14 @@ class _PlexConnectState extends State<PlexConnect> {
     SharedPreferences.getInstance().then((prefs) {
       final recentIp = prefs.getString(SavedValue.ip.key);
       final recentPort = prefs.getString(SavedValue.port.key);
-      final recentToken = prefs.getString(SavedValue.token.key);
       controller.addListener(() {
         setState(() {});
       });
       portController.addListener(() {
         setState(() {});
       });
-      tokenController.addListener(() {
-        setState(() {});
-      });
       if (recentIp != null) controller.text = recentIp;
       if (recentPort != null) portController.text = recentPort;
-      if (recentToken != null) tokenController.text = recentToken;
     });
   }
 
@@ -121,25 +115,6 @@ class _PlexConnectState extends State<PlexConnect> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade400,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(30),
-                      ),
-                    ),
-                    child: Center(
-                      child: TextField(
-                        style: const TextStyle(fontSize: 12),
-                        controller: tokenController,
-                        decoration: const InputDecoration(
-                          hintText: "Enter Token",
-                          contentPadding: EdgeInsets.all(10.0),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -154,7 +129,6 @@ class _PlexConnectState extends State<PlexConnect> {
               movies2Path: widget.movies2Path,
               tv1Path: widget.tv1Path,
               tv2Path: widget.tv2Path,
-              token: tokenController.text,
             )
           ],
         );
