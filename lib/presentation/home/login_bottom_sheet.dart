@@ -1,14 +1,44 @@
 import 'package:flutter/material.dart';
 
-class LoginBottomSheet extends StatelessWidget {
+class LoginBottomSheet extends StatefulWidget {
   const LoginBottomSheet({
     super.key,
     required this.login,
     required this.loading,
+    required this.savedUsername,
   });
 
   final Function(String username, String password) login;
   final bool loading;
+  final String? savedUsername;
+
+  @override
+  State<LoginBottomSheet> createState() => _LoginBottomSheetState();
+}
+
+class _LoginBottomSheetState extends State<LoginBottomSheet> {
+  late TextEditingController username;
+  late TextEditingController password;
+
+  @override
+  void initState() {
+    super.initState();
+    username = TextEditingController(text: widget.savedUsername);
+    password = TextEditingController();
+    username.addListener(listener);
+    password.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    username.removeListener(listener);
+    password.removeListener(listener);
+    super.dispose();
+  }
+
+  void listener() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +54,35 @@ class LoginBottomSheet extends StatelessWidget {
         children: <Widget>[
           TextField(
             decoration: InputDecoration(labelText: 'Username'),
+            autocorrect: false,
+            controller: username,
+            obscureText: false,
           ),
           TextField(
             decoration: InputDecoration(labelText: 'Password'),
+            autocorrect: false,
+            controller: password,
             obscureText: true,
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
-              login("ash.brindle97@gmail.com", "Noxious2@");
-              Navigator.pop(context);
-            },
+            style: ButtonStyle(
+                backgroundColor:
+                    enabled ? null : WidgetStateProperty.all(Colors.grey)),
+            onPressed: enabled
+                ? () {
+                    if (enabled) {
+                      widget.login(username.text, password.text);
+                      Navigator.pop(context);
+                    }
+                  }
+                : null,
             child: Text('Login'),
           ),
         ],
       ),
     );
   }
+
+  bool get enabled => username.text.isNotEmpty && password.text.isNotEmpty;
 }

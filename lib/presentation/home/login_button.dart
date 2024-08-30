@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:plex_extractor_app/presentation/home/login_bottom_sheet.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
@@ -10,9 +9,11 @@ class LoginButton extends StatelessWidget {
     super.key,
     required this.token,
     required this.loginStatus,
+    required this.savedUsername,
   });
   final String? token;
   final PlexLoginStatus loginStatus;
+  final String? savedUsername;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +29,7 @@ class LoginButton extends StatelessWidget {
             isScrollControlled: true,
             context: context,
             builder: (context) => LoginBottomSheet(
+              savedUsername: savedUsername,
               login: (String username, String password) async {
                 await context.read<PlexCubit>().login(username, password);
               },

@@ -9,6 +9,7 @@ class PlexState extends Equatable {
   final String? recentToken;
   final String? error;
   final String? lastSaved;
+  final String? savedUsername;
   final PlexStatus globalStatus;
   final PlexLoginStatus plexLoginStatus;
 
@@ -20,6 +21,7 @@ class PlexState extends Equatable {
     required this.lastSaved,
     required this.globalStatus,
     required this.plexLoginStatus,
+    required this.savedUsername,
     this.error,
   });
 
@@ -30,6 +32,7 @@ class PlexState extends Equatable {
         recentPort = null,
         recentToken = null,
         error = null,
+        savedUsername = null,
         plexLoginStatus = PlexLoginStatus.noAuthToken,
         globalStatus = PlexStatus.init;
 
@@ -41,6 +44,7 @@ class PlexState extends Equatable {
         lastSaved: lastSaved,
         globalStatus: globalStatus,
         plexLoginStatus: PlexLoginStatus.noAuthToken,
+        savedUsername: savedUsername,
       );
 
   PlexState copyWith({
@@ -50,10 +54,12 @@ class PlexState extends Equatable {
     String? recentToken,
     String? error,
     String? lastSaved,
+    String? savedUsername,
     PlexStatus? globalStatus,
     PlexLoginStatus? plexLoginStatus,
   }) {
     return PlexState(
+      savedUsername: savedUsername ?? this.savedUsername,
       recentIp: recentIp ?? this.recentIp,
       recentPort: recentPort ?? this.recentPort,
       recentToken: recentToken ?? this.recentToken,
@@ -74,6 +80,7 @@ class PlexState extends Equatable {
         lastSaved,
         plexLoginStatus,
         error,
+        savedUsername
       ];
 }
 

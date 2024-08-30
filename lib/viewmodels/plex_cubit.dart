@@ -141,11 +141,13 @@ class PlexCubit extends Cubit<PlexState> {
   Future<String?> _fetchToken() async {
     emit(state.copyWith(plexLoginStatus: PlexLoginStatus.loading));
     final token = await _plexRepository.recentToken;
+    final savedUsername = await _plexRepository.savedUsername;
     if (token != null) {
       emit(
         state.copyWith(
           plexLoginStatus: PlexLoginStatus.hasAuthToken,
           recentToken: token,
+          savedUsername: savedUsername,
         ),
       );
     } else {
@@ -153,6 +155,7 @@ class PlexCubit extends Cubit<PlexState> {
         state.copyWith(
           plexLoginStatus: PlexLoginStatus.noAuthToken,
           recentToken: token,
+          savedUsername: savedUsername,
         ),
       );
     }
@@ -168,6 +171,7 @@ class PlexCubit extends Cubit<PlexState> {
         state.copyWith(
           plexLoginStatus: PlexLoginStatus.hasAuthToken,
           recentToken: token,
+          savedUsername: username,
         ),
       );
     } else {

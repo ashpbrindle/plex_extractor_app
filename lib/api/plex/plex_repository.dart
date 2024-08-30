@@ -16,6 +16,9 @@ class PlexRepository {
   final PlexApi api;
   final Future<SharedPreferences> sharedPreferences;
 
+  Future<String?> get savedUsername => sharedPreferences
+      .then((prefs) => prefs.getString(SavedValue.username.key));
+
   Future<List<Media>> getMedia(
     String ip,
     String port,
@@ -28,11 +31,17 @@ class PlexRepository {
   Future<String?> login({
     required String username,
     required String password,
-  }) =>
-      api.login(
-        username: username,
-        password: password,
-      );
+  }) async {
+    final token = await api.login(
+      username: username,
+      password: password,
+    );
+    if (token != null) {
+      final SharedPreferences prefs = await sharedPreferences;
+      await prefs.setString(SavedValue.username.key, username);
+    }
+    return token;
+  }
 
   Future<void> logout() async {
     final prefs = await sharedPreferences;
@@ -121,6 +130,7 @@ class PlexRepository {
 
 enum SavedValue {
   media("media"),
+  username("username"),
   date("lastSave"),
   ip("recentIp"),
   port("recentPort"),
