@@ -9,15 +9,17 @@ class PlexCubit extends Cubit<PlexState> {
   PlexCubit({
     required PlexRepository plexRepository,
   })  : _plexRepository = plexRepository,
-        super(PlexState.init()) {
-    getSavedMedia();
-  }
+        super(PlexState.init());
 
   final PlexRepository _plexRepository;
 
-  Future<void> getSavedMedia() async {
-    final (List<PlexLibrary> media, String? lastSave) =
-        await _plexRepository.retrieveSavedMedia();
+  /// Fetches any saved token, and retrieves any saved list of media from previous refreshes
+  Future<void> init() async {
+    await _fetchToken();
+    final (
+      List<PlexLibrary> media,
+      String? lastSave,
+    ) = await _plexRepository.retrieveSavedMedia();
     emit(
       state.copyWith(
         media: media,
@@ -28,15 +30,17 @@ class PlexCubit extends Cubit<PlexState> {
     );
   }
 
-  void extractMedia(String ip, String port, String token) async {
-    _moveLibrariesToLoading(ip, port, token);
-    await _retrieveNewMedia(ip, port, token);
-    final libraries = state.media;
+  /// Moves to a loading state and retrieves media from the provided ip and port
+  void extractMedia(String ip, String port) async {
+    // Moves to Loading PlexStatus
+    _plexLoadingStatus(ip, port);
+    // Retrieves all libraries for the provided ip and port, and emits the value of empty libraries
+    final libraries = await _retrieveNewMedia(ip, port);
     String? lastSuccessfulDate;
+    // Retrieves all media for the provided libraries
     for (final library in libraries) {
       print("Attempting to Extract ${library.name}");
-      lastSuccessfulDate =
-          await _populateLibrary(ip, port, token, library: library);
+      lastSuccessfulDate = await _populateLibrary(ip, port, library: library);
       print(
         "Extracted ${library.name} ${state.media.firstWhere(
           (element) => element.id == library.id,
@@ -44,39 +48,61 @@ class PlexCubit extends Cubit<PlexState> {
       );
     }
     if (lastSuccessfulDate != null) {
-      _plexRepository.saveMedia(
-        medias: state.media,
-        recentIp: ip,
-        recentPort: port,
-        recentToken: token,
-        lastSave: lastSuccessfulDate,
-      );
-      emit(
-        state.copyWith(
-          globalStatus: PlexStatus.loaded,
-          lastSaved: lastSuccessfulDate,
-        ),
-      );
+      if (state.credentials.authToken != null) {
+        await _plexRepository.saveMedia(
+          medias: state.media,
+          lastSave: lastSuccessfulDate,
+        );
+        await _plexRepository.saveCredentials(
+          recentIp: ip,
+          recentPort: port,
+          recentToken: state.credentials.authToken!,
+        );
+
+        emit(
+          state.copyWith(
+            globalStatus: PlexStatus.loaded,
+            lastSaved: lastSuccessfulDate,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            plexLoginStatus: PlexLoginStatus.noAuthToken,
+            error: "Auth token invalid, Login",
+          ),
+        );
+      }
     } else {
-      getSavedMedia();
+      init();
     }
   }
 
+  /// Populates a PlexLibrary after it has been retrieved and will return a String of the timestamp it was retrieved
   Future<String?> _populateLibrary(
     String ip,
-    String port,
-    String plexToken, {
+    String port, {
     required PlexLibrary library,
   }) async {
     List<PlexLibrary> newMedia = [...state.media];
     final index = newMedia.indexWhere((element) => element.id == library.id);
     try {
-      final items =
-          await _plexRepository.getMedia(ip, port, plexToken, media: library);
-      newMedia[index] =
-          library.copyWith(items: items, status: PlexStatus.loaded);
-      emit(state.copyWith(media: [...newMedia]));
-      return DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+      if (state.credentials.authToken != null) {
+        final items = await _plexRepository
+            .getMedia(ip, port, state.credentials.authToken!, media: library);
+        newMedia[index] =
+            library.copyWith(items: items, status: PlexStatus.loaded);
+        emit(state.copyWith(media: [...newMedia]));
+        return DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+      } else {
+        emit(
+          state.copyWith(
+            plexLoginStatus: PlexLoginStatus.noAuthToken,
+            error: "Auth token invalid, Login",
+          ),
+        );
+        return null;
+      }
     } catch (e) {
       newMedia[index] = library.copyWith(items: [], status: PlexStatus.error);
       emit(state.copyWith(media: [...newMedia]));
@@ -84,22 +110,28 @@ class PlexCubit extends Cubit<PlexState> {
     }
   }
 
-  Future<void> _retrieveNewMedia(String ip, String port, String token) async {
+  /// Retrieves all the libraries available on the server (Initial state is empty and will have to be populated after using [Future<String?> _populateLibrary(String ip, String port, {required PlexLibrary library,})])
+  Future<List<PlexLibrary>> _retrieveNewMedia(String ip, String port) async {
     try {
-      final libraries = await _plexRepository.getLibraries(ip, port, token);
-      List<PlexLibrary> plexLibraries = [];
-      libraries.forEach(
-        (id, name) => plexLibraries.add(
-          PlexLibrary(
-            name: name,
-            id: id,
-            items: const [],
-            status: PlexStatus.loading,
+      if (state.credentials.authToken != null) {
+        final libraries = await _plexRepository.getLibraries(
+            ip, port, state.credentials.authToken!);
+        List<PlexLibrary> plexLibraries = [];
+        libraries.forEach(
+          (id, name) => plexLibraries.add(
+            PlexLibrary(
+              name: name,
+              id: id,
+              items: const [],
+              status: PlexStatus.loading,
+            ),
           ),
-        ),
-      );
-      emit(state.copyWith(media: [...plexLibraries]));
-      print("Found ${state.media.map((e) => e.name)}");
+        );
+        print("Found ${state.media.map((e) => e.name)}");
+        emit(state.copyWith(media: [...plexLibraries]));
+        return plexLibraries;
+      }
+      return [];
     } catch (e) {
       List<PlexLibrary> newMedia = [...state.media];
       for (int i = 0; i < newMedia.length; i++) {
@@ -112,23 +144,76 @@ class PlexCubit extends Cubit<PlexState> {
           media: [...newMedia],
         ),
       );
+      return newMedia;
     }
   }
 
-  void _moveLibrariesToLoading(String ip, String port, String token) {
+  Future<String?> _fetchToken() async {
+    emit(state.copyWith(plexLoginStatus: PlexLoginStatus.loading));
+    final token = await _plexRepository.recentToken;
+    final savedUsername = await _plexRepository.savedUsername;
+    if (token != null) {
+      emit(
+        state.copyWith(
+          plexLoginStatus: PlexLoginStatus.hasAuthToken,
+          authToken: token,
+          username: savedUsername,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          plexLoginStatus: PlexLoginStatus.noAuthToken,
+          authToken: token,
+          username: savedUsername,
+        ),
+      );
+    }
+    return token;
+  }
+
+  Future<bool> login(String username, String password) async {
+    emit(state.copyWith(plexLoginStatus: PlexLoginStatus.loading));
+    String? token =
+        await _plexRepository.login(username: username, password: password);
+    if (token != null) {
+      emit(
+        state.copyWith(
+          plexLoginStatus: PlexLoginStatus.hasAuthToken,
+          authToken: token,
+          username: username,
+        ),
+      );
+      return true;
+    } else {
+      emit(
+        state.copyWith(
+          plexLoginStatus: PlexLoginStatus.noAuthToken,
+          error: "Invalid Login Credentials, Try again",
+          authToken: token,
+        ),
+      );
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
+    emit(state.copyWith(plexLoginStatus: PlexLoginStatus.loading));
+    _plexRepository.logout();
+    emit(state.resetToken());
+  }
+
+  void _plexLoadingStatus(String ip, String port) {
     List<PlexLibrary> library = [];
     for (var element in state.media) {
       library.add(element.copyWith(status: PlexStatus.loading));
     }
     emit(
-      PlexState(
-        recentIp: ip,
-        recentPort: port,
-        recentToken: token,
+      state.copyWith(
+        ip: ip,
+        port: port,
         media: library,
-        lastSaved: state.lastSaved,
         globalStatus: PlexStatus.loading,
-        error: null,
       ),
     );
   }

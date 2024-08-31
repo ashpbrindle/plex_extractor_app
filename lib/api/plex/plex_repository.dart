@@ -16,6 +16,9 @@ class PlexRepository {
   final PlexApi api;
   final Future<SharedPreferences> sharedPreferences;
 
+  Future<String?> get savedUsername => sharedPreferences
+      .then((prefs) => prefs.getString(SavedValue.username.key));
+
   Future<List<Media>> getMedia(
     String ip,
     String port,
@@ -25,15 +28,33 @@ class PlexRepository {
     return api.getMedia(media, ip, port, token);
   }
 
+  Future<String?> login({
+    required String username,
+    required String password,
+  }) async {
+    final token = await api.login(
+      username: username,
+      password: password,
+    );
+    if (token != null) {
+      final SharedPreferences prefs = await sharedPreferences;
+      await prefs.setString(SavedValue.username.key, username);
+      await prefs.setString(SavedValue.token.key, token);
+    }
+    return token;
+  }
+
+  Future<void> logout() async {
+    final prefs = await sharedPreferences;
+    prefs.remove(SavedValue.token.key);
+  }
+
   Future<Map<String, String>> getLibraries(
           String ip, String port, String token) async =>
       api.getLibraries(ip, port, token);
 
   Future<void> saveMedia({
     required List<PlexLibrary> medias,
-    required String recentIp,
-    required String recentPort,
-    required String recentToken,
     String? lastSave,
   }) async {
     final SharedPreferences prefs = await sharedPreferences;
@@ -48,6 +69,14 @@ class PlexRepository {
     }
     if (lastSave != null) await prefs.setString(SavedValue.date.key, lastSave);
     await prefs.setString(SavedValue.media.key, full);
+  }
+
+  Future<void> saveCredentials({
+    required String recentIp,
+    required String recentPort,
+    required String recentToken,
+  }) async {
+    final SharedPreferences prefs = await sharedPreferences;
     await prefs.setString(SavedValue.ip.key, recentIp);
     await prefs.setString(SavedValue.port.key, recentPort);
     await prefs.setString(SavedValue.token.key, recentToken);
@@ -107,6 +136,7 @@ class PlexRepository {
 
 enum SavedValue {
   media("media"),
+  username("username"),
   date("lastSave"),
   ip("recentIp"),
   port("recentPort"),

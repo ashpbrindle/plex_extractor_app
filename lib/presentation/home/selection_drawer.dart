@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:plex_extractor_app/presentation/home/login_bottom_sheet.dart';
+import 'package:plex_extractor_app/presentation/home/login_button.dart';
 import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
 import 'package:plex_extractor_app/presentation/home/status_view.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
@@ -28,6 +30,14 @@ class SelectionDrawer extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
+                      LoginButton(
+                        token: state.credentials.authToken,
+                        loginStatus: state.plexLoginStatus,
+                        savedUsername: state.credentials.username,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
@@ -35,14 +45,18 @@ class SelectionDrawer extends StatelessWidget {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 20),
-                          child: Text(
-                            state.lastSaved != null
-                                ? "${state.lastSaved}"
-                                : "N/A",
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w300),
+                            vertical: 5,
+                            horizontal: 20,
+                          ),
+                          child: Center(
+                            child: Text(
+                              state.lastSaved != null
+                                  ? "${state.lastSaved}"
+                                  : "N/A",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w300),
+                            ),
                           ),
                         ),
                       ),

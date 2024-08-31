@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
@@ -6,10 +7,59 @@ import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/viewmodels/plex_library.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/v4.dart';
 import 'package:xml/xml.dart';
 
 class PlexApi {
   // static const plexToken = "4uMqH75fXVvnEQ_yJZ6A";
+
+  Future<String?> login({
+    required String username,
+    required String password,
+  }) async {
+    const String productName = "PlexExtractorApp";
+    const String productVersion = "1.0";
+    const String uuid = "02bf5696-b8bb-4fca-8aaa-5cd4b3bfff62";
+
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'X-Plex-Client-Identifier': uuid,
+      'X-Plex-Product': productName,
+      'X-Plex-Version': productVersion,
+    };
+
+    final Map<String, dynamic> requestBody = {
+      'user': {
+        'login': username,
+        'password': password,
+      },
+    };
+    final String jsonBody = jsonEncode(requestBody);
+    final Uri apiUrl = Uri.parse('https://plex.tv/users/sign_in.json');
+    try {
+      // Make the POST request
+      final http.Response response = await http.post(
+        apiUrl,
+        headers: headers,
+        body: jsonBody,
+      );
+
+      if (response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final authToken = responseData['user']['authentication_token'];
+        print('Successfully retrieved auth token: $authToken');
+        return authToken;
+      } else {
+        print(
+            'Failed to authenticate: ${response.statusCode} ${response.reasonPhrase}');
+        return null;
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+      return null;
+    }
+  }
 
   /// Returns a map of id's and their paths
   Future<Map<String, String>> getLibraries(

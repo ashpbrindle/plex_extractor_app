@@ -9,21 +9,11 @@ class RefreshButton extends StatelessWidget {
     super.key,
     required this.ip,
     required this.port,
-    required this.token,
-    this.movies1Path,
-    this.movies2Path,
-    this.tv1Path,
-    this.tv2Path,
   });
 
   final PlexState state;
   final String ip;
   final String port;
-  final String token;
-  final String? movies1Path;
-  final String? movies2Path;
-  final String? tv1Path;
-  final String? tv2Path;
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +21,10 @@ class RefreshButton extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (ip.isEmpty || port.isEmpty || token.isEmpty) return;
-        return context.read<PlexCubit>().extractMedia(ip, port, token);
+        if (ip.isEmpty || port.isEmpty || state.credentials.authToken == null) {
+          return;
+        }
+        return context.read<PlexCubit>().extractMedia(ip, port);
       },
       child: Opacity(
         opacity: ip.isEmpty || port.isEmpty ? 0.2 : 1.0,
@@ -48,7 +40,9 @@ class RefreshButton extends StatelessWidget {
               width: 45,
               height: 45,
               decoration: BoxDecoration(
-                color: ip.isEmpty || port.isEmpty
+                color: ip.isEmpty ||
+                        port.isEmpty ||
+                        state.credentials.authToken == null
                     ? Colors.grey
                     : (showConnect ? Colors.green : Colors.purple),
                 borderRadius: const BorderRadius.all(
@@ -60,7 +54,9 @@ class RefreshButton extends StatelessWidget {
                 child: Center(
                   child: Icon(
                     showConnect ? Icons.cloud_download : Icons.sync,
-                    color: ip.isEmpty || port.isEmpty
+                    color: ip.isEmpty ||
+                            port.isEmpty ||
+                            state.credentials.authToken == null
                         ? Colors.blueGrey
                         : Colors.white,
                   ),
