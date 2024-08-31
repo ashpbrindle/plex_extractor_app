@@ -21,7 +21,10 @@ class RefreshButton extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (ip.isEmpty || port.isEmpty || state.credentials.authToken == null) {
+        if (ip.isEmpty ||
+            port.isEmpty ||
+            state.credentials.authToken == null ||
+            state.globalStatus == PlexStatus.loading) {
           return;
         }
         return context.read<PlexCubit>().extractMedia(ip, port);
@@ -42,7 +45,8 @@ class RefreshButton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: ip.isEmpty ||
                         port.isEmpty ||
-                        state.credentials.authToken == null
+                        state.credentials.authToken == null ||
+                        state.globalStatus == PlexStatus.loading
                     ? Colors.grey
                     : (showConnect ? Colors.green : Colors.purple),
                 borderRadius: const BorderRadius.all(

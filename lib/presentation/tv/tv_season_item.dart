@@ -23,6 +23,8 @@ class TvSeasonItem extends StatelessWidget {
           ),
         ),
         children: season.episodes
+            .asMap()
+            .entries
             .map(
               (episode) => Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -31,13 +33,25 @@ class TvSeasonItem extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        episode.name,
-                        style: style.copyWith(
-                            fontStyle: FontStyle.italic, fontSize: 12),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            (episode.key + 1).toString(),
+                            style: style.copyWith(
+                                fontStyle: FontStyle.italic, fontSize: 12),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            episode.value.name,
+                            style: style.copyWith(
+                                fontStyle: FontStyle.italic, fontSize: 12),
+                          ),
+                        ],
                       ),
                       Text(
-                        episode.resolution ?? "",
+                        episode.value.resolution ?? "",
                         style: style.copyWith(
                             fontStyle: FontStyle.italic, fontSize: 12),
                       ),

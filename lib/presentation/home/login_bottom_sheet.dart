@@ -85,48 +85,70 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             ],
           ),
           const SizedBox(height: 20),
-          if (loading) ...[
-            const SizedBox(
-              width: 15,
-              height: 15,
-              child: CircularProgressIndicator(),
-            ),
-            const SizedBox(height: 20),
-          ],
           if (errorOccured) ...[
             const Text(
-              'Invalid Credentials, try again',
+              'Login Failed',
               style: TextStyle(
                 color: Colors.red,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const Text(
+              'Please Ensure you are Connected to the Internet, your Credentials are Correct, and Try Again...',
+              style: TextStyle(
+                color: Colors.red,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            // const SizedBox(height: 10),
           ],
-          ElevatedButton(
-            style: ButtonStyle(
-                backgroundColor:
-                    enabled ? null : const WidgetStatePropertyAll(Colors.grey)),
-            onPressed: enabled
-                ? () {
-                    if (enabled) {
-                      setState(() {
-                        loading = true;
-                        errorOccured = false;
-                      });
-                      widget.login(username.text, password.text).then(
-                            (success) => success
-                                ? Navigator.pop(context)
-                                : setState(
-                                    () {
-                                      errorOccured = true;
-                                      loading = false;
-                                    },
-                                  ),
-                          );
-                    }
-                  }
-                : null,
-            child: Text('Login'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(
+                          enabled ? Colors.green : Colors.grey)),
+                  onPressed: enabled
+                      ? () {
+                          if (enabled) {
+                            setState(() {
+                              loading = true;
+                              errorOccured = false;
+                            });
+                            widget.login(username.text, password.text).then(
+                                  (success) => success
+                                      ? Navigator.pop(context)
+                                      : setState(
+                                          () {
+                                            errorOccured = true;
+                                            loading = false;
+                                          },
+                                        ),
+                                );
+                          }
+                        }
+                      : null,
+                  child: loading
+                      ? const SizedBox(
+                          width: 15,
+                          height: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'Login',
+                          style: enabled
+                              ? const TextStyle(color: Colors.white)
+                              : null,
+                        ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

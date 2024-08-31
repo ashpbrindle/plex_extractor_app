@@ -18,6 +18,11 @@ class LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll(
+          token != null ? Colors.red : Colors.green,
+        ),
+      ),
       onPressed: () {
         if (loginStatus == PlexLoginStatus.loading) {
           return;
@@ -45,7 +50,10 @@ class LoginButton extends StatelessWidget {
               width: 15,
               child: CircularProgressIndicator(),
             )
-          : Text(token != null ? "Logout" : "Login"),
+          : Text(
+              token != null ? "Logout" : "Login",
+              style: TextStyle(color: Colors.white),
+            ),
     );
   }
 }
