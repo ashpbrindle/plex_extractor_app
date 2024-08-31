@@ -22,4 +22,19 @@ class Movie extends Media {
         "type": type,
         "resolution": resolution,
       };
+
+  @override
+  Media? filterByQuality(
+    bool show4k,
+    bool show1080,
+    bool showOther,
+  ) {
+    if ((show4k && resolution == "4k") ||
+        (show1080 && resolution == "1080") ||
+        (showOther && resolution != "4k" && resolution != "1080")) {
+      return this;
+    } else {
+      return null;
+    }
+  }
 }

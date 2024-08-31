@@ -40,8 +40,6 @@ class _HomeState extends State<Home> {
       themeMode: ThemeMode.light,
       theme: ThemeData(useMaterial3: true),
       home: BlocBuilder<PlexCubit, PlexState>(builder: (context, state) {
-        List<PlexLibrary> filteredMovies =
-            _filteredMovies(state.media, searchController.text);
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -115,61 +113,67 @@ class _HomeState extends State<Home> {
                       Expanded(
                         child: CustomScrollView(
                           slivers: [
-                            ...filteredMovies.map(
-                              (e) => SliverStickyHeader(
-                                header: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Container(
-                                      decoration: const BoxDecoration(
-                                        color: Color.fromARGB(255, 14, 25, 74),
-                                        border: Border.symmetric(
-                                          horizontal:
-                                              BorderSide(color: Colors.white),
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                e.name,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                ),
+                            ...state.media
+                                .filterByName(searchController.text)
+                                .filterByQuality(show4k, show1080, showOther)
+                                .map(
+                                  (e) => SliverStickyHeader(
+                                    header: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Container(
+                                          decoration: const BoxDecoration(
+                                            color:
+                                                Color.fromARGB(255, 14, 25, 74),
+                                            border: Border.symmetric(
+                                              horizontal: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    e.name,
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    e.items.length.toString(),
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              Text(
-                                                e.items.length.toString(),
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ],
+                                            ),
                                           ),
                                         ),
+                                      ],
+                                    ),
+                                    sliver: SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (context, i) {
+                                          final media = e.items[i];
+                                          if (media is TvShow) {
+                                            return TvRowItem(tvShow: media);
+                                          } else {
+                                            return MediaRowItem(media: media);
+                                          }
+                                        },
+                                        childCount: e.items.length,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                sliver: SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, i) {
-                                      final media = e.items[i];
-                                      if (media is TvShow) {
-                                        return TvRowItem(tvShow: media);
-                                      } else {
-                                        return MediaRowItem(media: media);
-                                      }
-                                    },
-                                    childCount: e.items.length,
                                   ),
                                 ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -184,46 +188,6 @@ class _HomeState extends State<Home> {
       }),
     );
   }
-
-  List<PlexLibrary> _filteredMovies(List<PlexLibrary> media, String search) =>
-      _filterByQuality(
-        _filterByName(media, search),
-      );
-
-  List<PlexLibrary> _filterByQuality(List<PlexLibrary> medias) {
-    return medias.where((library) {
-      library.items = library.items.where((media) {
-        if (media is Movie) {
-          if (((show4k && media.resolution == "4k") ||
-                  (show1080 && media.resolution == "1080")) ||
-              showOther &&
-                  (media.resolution != "4k" && media.resolution != "1080")) {
-            return true;
-          }
-          return false;
-        } else {
-          return true;
-        }
-      }).toList();
-      return library.items.isNotEmpty;
-    }).toList();
-  }
-
-  List<PlexLibrary> _filterByName(List<PlexLibrary> media, String search) =>
-      media
-          .map((library) {
-            List<Media> filteredItems = library.items
-                .where((movie) =>
-                    movie.name.toLowerCase().contains(search.toLowerCase()))
-                .toList();
-            return PlexLibrary(
-                name: library.name,
-                id: library.id,
-                items: filteredItems,
-                status: library.status);
-          })
-          .where((element) => element.items.isNotEmpty)
-          .toList();
 }
 
 final globalNavigatorKey = GlobalKey<NavigatorState>();

@@ -33,4 +33,41 @@ class TvShow extends Media {
         "seasons": seasons,
         "year": year,
       };
+
+  @override
+  TvShow? filterByQuality(
+    bool show4k,
+    bool show1080,
+    bool showOther,
+  ) {
+    if (seasons == null) return this;
+    List<TvShowSeason> newSeasons = [];
+    for (final season in seasons!) {
+      List<TvShowEpisode> newEpisodes = [];
+      for (final episode in season.episodes) {
+        if ((show4k && episode.resolution == "4k") ||
+            (show1080 && episode.resolution == "1080") ||
+            (showOther &&
+                episode.resolution != "4k" &&
+                episode.resolution != "1080")) {
+          newEpisodes.add(episode);
+        }
+      }
+      if (newEpisodes.isNotEmpty) {
+        newSeasons.add(
+          TvShowSeason(
+            name: season.name,
+            episodes: newEpisodes,
+          ),
+        );
+      }
+    }
+    if (newSeasons.isEmpty) return null;
+    return TvShow(
+      name: name,
+      year: year,
+      type: type,
+      seasons: newSeasons,
+    );
+  }
 }
