@@ -83,6 +83,7 @@ class SelectionDrawer extends StatelessWidget {
                           .map(
                             (e) => StatusView(
                               media: e,
+                              complete: state.globalStatus != PlexStatus.loading,
                             ),
                           )
                           .toList()

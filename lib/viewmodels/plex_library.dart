@@ -7,12 +7,16 @@ class PlexLibrary extends Equatable {
   final String name;
   final String id;
   final PlexStatus status;
+  final int total;
+  final int count;
 
   PlexLibrary({
     required this.name,
     required this.id,
     required this.items,
     required this.status,
+    this.total = 0,
+    this.count = 0,
   });
 
   PlexLibrary copyWith({
@@ -20,16 +24,20 @@ class PlexLibrary extends Equatable {
     String? id,
     List<Media>? items,
     PlexStatus? status,
+    int? count,
+    int? total,
   }) =>
       PlexLibrary(
         name: name ?? this.name,
         id: id ?? this.id,
         items: items ?? this.items,
         status: status ?? this.status,
+        total: total ?? this.total,
+        count: count ?? this.count,
       );
 
   @override
-  List<Object?> get props => [name, id, items, status];
+  List<Object?> get props => [name, id, items, status, total, count];
 }
 
 extension FilterLibraryExtension on List<PlexLibrary> {

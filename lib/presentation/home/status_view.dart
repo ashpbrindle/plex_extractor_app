@@ -6,34 +6,48 @@ class StatusView extends StatelessWidget {
   const StatusView({
     super.key,
     required this.media,
+    required this.complete,
   });
 
   final PlexLibrary media;
+  final bool complete;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              media.status.statusWidget,
-              const SizedBox(
-                width: 10,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  media.status.statusWidget,
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Text(
+                      media.name,
+                    ),
+                  ),
+                  if (media.status.isLoading)
+                    Text("${media.count}/${media.total}"),
+                  if (media.status.isLoaded) Text("${media.items.length}")
+                ],
               ),
-              Expanded(
-                child: Text(
-                  media.name,
-                ),
-              ),
-              if (media.status.isLoaded) Text("${media.items.length}")
-            ],
+            ),
           ),
         ),
-      ),
+        if (media.total != 0 && !complete)
+          LinearProgressIndicator(
+            value: media.count / media.total,
+            color: media.total == media.count ? Colors.green : Colors.purple,
+            backgroundColor: const Color.fromARGB(255, 178, 193, 201),
+          )
+      ],
     );
   }
 }
