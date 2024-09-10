@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
 import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
@@ -16,27 +18,31 @@ class StatusView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  media.status.statusWidget,
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Text(
-                      media.name,
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => context.read<PlexCubit>().showHideLibrary(media.name),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Center(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    media.statusWidget,
+                    const SizedBox(
+                      width: 5,
                     ),
-                  ),
-                  if (media.status.isLoading)
-                    Text("${media.count}/${media.total}"),
-                  if (media.status.isLoaded) Text("${media.items.length}")
-                ],
+                    Expanded(
+                      child: Text(
+                        media.name,
+                      ),
+                    ),
+                    if (media.isLoading) Text("${media.count}/${media.total}"),
+                    if (media.isLoaded) Text("${media.items.length}")
+                  ],
+                ),
               ),
             ),
           ),
@@ -52,17 +58,17 @@ class StatusView extends StatelessWidget {
   }
 }
 
-extension PlexStatusExtension on PlexStatus {
-  bool get isLoaded => this == PlexStatus.loaded;
-  bool get isLoading => this == PlexStatus.loading;
+extension PlexStatusExtension on PlexLibrary {
+  bool get isLoaded => status == PlexStatus.loaded;
+  bool get isLoading => status == PlexStatus.loading;
 
-  Color get colour => switch (this) {
+  Color get colour => switch (status) {
         PlexStatus.init || PlexStatus.loading => Colors.orange,
         PlexStatus.loaded => Colors.green,
         PlexStatus.error => Colors.red
       };
 
-  Widget get statusWidget => switch (this) {
+  Widget get statusWidget => switch (status) {
         PlexStatus.init => Icon(
             Icons.question_mark,
             size: 24,
@@ -77,9 +83,8 @@ extension PlexStatusExtension on PlexStatus {
             ),
           ),
         PlexStatus.loaded => Icon(
-            Icons.check,
-            size: 24,
-            color: colour,
+          color: Colors.purple,
+            visible ? Icons.visibility : Icons.visibility_off,
           ),
         PlexStatus.error => Icon(
             Icons.error,

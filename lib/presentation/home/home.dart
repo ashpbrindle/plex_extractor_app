@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/models/movie.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
+import 'package:plex_extractor_app/presentation/home/library_section_widget.dart';
 import 'package:plex_extractor_app/presentation/home/selection_drawer.dart';
 import 'package:plex_extractor_app/presentation/home/text_input.dart';
-import 'package:plex_extractor_app/presentation/movie/media_row_item.dart';
-import 'package:plex_extractor_app/presentation/tv/tv_row_item.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
 import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
@@ -23,6 +19,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController searchController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  bool isAboveHalfWay = true;
   bool show4k = true;
   bool show1080 = true;
   bool showOther = true;
@@ -31,6 +29,13 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     searchController.addListener(() => setState(() {}));
+    scrollController.addListener(() {
+      final halfWay = scrollController.position.maxScrollExtent / 2;
+      final currentScrollPosition = scrollController.position.pixels;
+      setState(() {
+        isAboveHalfWay = currentScrollPosition < halfWay;
+      });
+    });
   }
 
   @override
@@ -41,6 +46,15 @@ class _HomeState extends State<Home> {
       theme: ThemeData(useMaterial3: true),
       home: BlocBuilder<PlexCubit, PlexState>(builder: (context, state) {
         return Scaffold(
+          floatingActionButton: FloatingActionButton.small(
+            child: Icon(
+                isAboveHalfWay ? Icons.arrow_downward : Icons.arrow_upward),
+            onPressed: () {
+              scrollController.jumpTo(isAboveHalfWay
+                  ? scrollController.position.maxScrollExtent
+                  : 0);
+            },
+          ),
           appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color.fromARGB(255, 178, 193, 201),
@@ -111,70 +125,25 @@ class _HomeState extends State<Home> {
                       ),
                       const SizedBox(height: 10),
                       Expanded(
-                        child: CustomScrollView(
-                          slivers: [
-                            ...state.media
-                                .filterByName(searchController.text)
-                                .filterByQuality(show4k, show1080, showOther)
-                                .map(
-                                  (e) => SliverStickyHeader(
-                                    header: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Container(
-                                          decoration: const BoxDecoration(
-                                            color:
-                                                Color.fromARGB(255, 14, 25, 74),
-                                            border: Border.symmetric(
-                                              horizontal: BorderSide(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                          child: Center(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    e.name,
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    e.items.length.toString(),
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    sliver: SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (context, i) {
-                                          final media = e.items[i];
-                                          if (media is TvShow) {
-                                            return TvRowItem(tvShow: media);
-                                          } else {
-                                            return MediaRowItem(media: media);
-                                          }
-                                        },
-                                        childCount: e.items.length,
-                                      ),
-                                    ),
+                        child: RawScrollbar(
+                          thumbColor:  Color.fromARGB(255, 14, 25, 74),
+                          controller: scrollController,
+                          trackVisibility: true,
+                          thumbVisibility: true,
+                          thickness: 10,
+                          child: CustomScrollView(
+                            controller: scrollController,
+                            slivers: [
+                              ...state.media
+                                  .filterByName(searchController.text)
+                                  .filterByQuality(show4k, show1080, showOther)
+                                  .map(
+                                    (e) => e.visible
+                                        ? LibrarySectionWidget(library: e)
+                                        : SliverStickyHeader(),
                                   ),
-                                ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],

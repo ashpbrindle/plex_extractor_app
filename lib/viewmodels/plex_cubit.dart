@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:plex_extractor_app/api/plex/plex_repository.dart';
@@ -32,6 +31,23 @@ class PlexCubit extends Cubit<PlexState> {
       ),
     );
     listenToUpdates();
+  }
+
+  Future<void> showHideLibrary(String name) async {
+    List<PlexLibrary> libraries = [...state.media];
+    final updatedLibraries = libraries.map((library) {
+      if (library.name == name) {
+        return library.copyWith(visible: !library.visible);
+      } else {
+        return library;
+      }
+    }).toList();
+
+    emit(
+      state.copyWith(
+        media: updatedLibraries,
+      ),
+    );
   }
 
   Future<void> listenToUpdates() async {

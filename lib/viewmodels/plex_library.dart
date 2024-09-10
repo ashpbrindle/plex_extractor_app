@@ -3,20 +3,23 @@ import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
 class PlexLibrary extends Equatable {
-  List<Media> items;
+  final List<Media> items;
   final String name;
   final String id;
   final PlexStatus status;
+
   final int total;
   final int count;
+  final bool visible;
 
-  PlexLibrary({
+  const PlexLibrary({
     required this.name,
     required this.id,
     required this.items,
     required this.status,
     this.total = 0,
     this.count = 0,
+    this.visible = true,
   });
 
   PlexLibrary copyWith({
@@ -26,6 +29,7 @@ class PlexLibrary extends Equatable {
     PlexStatus? status,
     int? count,
     int? total,
+    bool? visible,
   }) =>
       PlexLibrary(
         name: name ?? this.name,
@@ -34,22 +38,31 @@ class PlexLibrary extends Equatable {
         status: status ?? this.status,
         total: total ?? this.total,
         count: count ?? this.count,
+        visible: visible ?? this.visible,
       );
 
   @override
-  List<Object?> get props => [name, id, items, status, total, count];
+  List<Object?> get props => [
+        name,
+        id,
+        items,
+        status,
+        total,
+        count,
+        visible,
+      ];
 }
 
 extension FilterLibraryExtension on List<PlexLibrary> {
   List<PlexLibrary> filterByQuality(
       bool show4k, bool show1080, bool showOther) {
     List<PlexLibrary> filteredLibraries = map((library) {
-      return PlexLibrary(
+      return library.copyWith(
         items: library.items.filterByQuality(
-            show4k: show4k, show1080: show1080, showOther: showOther),
-        name: library.name,
-        id: library.id,
-        status: library.status,
+          show4k: show4k,
+          show1080: show1080,
+          showOther: showOther,
+        ),
       );
     }).toList();
     return filteredLibraries
@@ -62,10 +75,8 @@ extension FilterLibraryExtension on List<PlexLibrary> {
             .where((movie) =>
                 movie.name.toLowerCase().contains(search.toLowerCase()))
             .toList();
-        return PlexLibrary(
-            name: library.name,
-            id: library.id,
-            items: filteredItems,
-            status: library.status);
+        return library.copyWith(
+          items: filteredItems,
+        );
       }).where((element) => element.items.isNotEmpty).toList();
 }

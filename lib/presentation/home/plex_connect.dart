@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:plex_extractor_app/api/plex/plex_repository.dart';
-import 'package:plex_extractor_app/presentation/home/login_button.dart';
 import 'package:plex_extractor_app/presentation/home/refresh_button.dart';
 import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:plex_extractor_app/presentation/home/login_bottom_sheet.dart';
 import 'package:plex_extractor_app/presentation/home/login_button.dart';
 import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
 import 'package:plex_extractor_app/presentation/home/status_view.dart';
