@@ -78,7 +78,7 @@ class SelectionDrawer extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      ...state.media
+                      ...state.libraries
                           .map(
                             (e) => StatusView(
                               media: e,

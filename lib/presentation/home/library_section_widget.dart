@@ -42,7 +42,7 @@ class LibrarySectionWidget extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
-                        library.items.length.toString(),
+                        library.medias.length.toString(),
                         style: const TextStyle(
                           color: Colors.white,
                         ),
@@ -59,14 +59,14 @@ class LibrarySectionWidget extends StatelessWidget {
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, i) {
-            final media = library.items[i];
+            final media = library.medias[i];
             if (media is TvShow) {
               return TvRowItem(tvShow: media);
             } else {
               return MediaRowItem(media: media);
             }
           },
-          childCount: library.items.length,
+          childCount: library.medias.length,
         ),
       ),
     );

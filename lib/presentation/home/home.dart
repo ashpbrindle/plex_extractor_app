@@ -61,7 +61,7 @@ class _HomeState extends State<Home> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                if (state.media.isNotEmpty)
+                if (state.libraries.isNotEmpty)
                   Row(
                     children: [
                       const Text(
@@ -116,7 +116,7 @@ class _HomeState extends State<Home> {
           drawer: const SelectionDrawer(),
           backgroundColor: const Color.fromARGB(255, 178, 193, 201),
           body: SafeArea(
-            child: state.media.isNotEmpty
+            child: state.libraries.isNotEmpty
                 ? Column(
                     children: [
                       TextInput(
@@ -134,7 +134,7 @@ class _HomeState extends State<Home> {
                           child: CustomScrollView(
                             controller: scrollController,
                             slivers: [
-                              ...state.media
+                              ...state.libraries
                                   .filterByName(searchController.text)
                                   .filterByQuality(show4k, show1080, showOther)
                                   .map(

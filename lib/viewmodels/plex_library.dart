@@ -3,7 +3,7 @@ import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
 class PlexLibrary extends Equatable {
-  final List<Media> items;
+  final List<Media> medias;
   final String name;
   final String id;
   final PlexStatus status;
@@ -15,7 +15,7 @@ class PlexLibrary extends Equatable {
   const PlexLibrary({
     required this.name,
     required this.id,
-    required this.items,
+    required this.medias,
     required this.status,
     this.total = 0,
     this.count = 0,
@@ -34,7 +34,7 @@ class PlexLibrary extends Equatable {
       PlexLibrary(
         name: name ?? this.name,
         id: id ?? this.id,
-        items: items ?? this.items,
+        medias: items ?? this.medias,
         status: status ?? this.status,
         total: total ?? this.total,
         count: count ?? this.count,
@@ -45,7 +45,7 @@ class PlexLibrary extends Equatable {
   List<Object?> get props => [
         name,
         id,
-        items,
+        medias,
         status,
         total,
         count,
@@ -58,7 +58,7 @@ extension FilterLibraryExtension on List<PlexLibrary> {
       bool show4k, bool show1080, bool showOther) {
     List<PlexLibrary> filteredLibraries = map((library) {
       return library.copyWith(
-        items: library.items.filterByQuality(
+        items: library.medias.filterByQuality(
           show4k: show4k,
           show1080: show1080,
           showOther: showOther,
@@ -66,17 +66,17 @@ extension FilterLibraryExtension on List<PlexLibrary> {
       );
     }).toList();
     return filteredLibraries
-        .where((library) => library.items.isNotEmpty)
+        .where((library) => library.medias.isNotEmpty)
         .toList();
   }
 
   List<PlexLibrary> filterByName(String search) => map((library) {
-        List<Media> filteredItems = library.items
+        List<Media> filteredItems = library.medias
             .where((movie) =>
                 movie.name.toLowerCase().contains(search.toLowerCase()))
             .toList();
         return library.copyWith(
           items: filteredItems,
         );
-      }).where((element) => element.items.isNotEmpty).toList();
+      }).where((element) => element.medias.isNotEmpty).toList();
 }

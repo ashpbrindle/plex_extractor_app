@@ -31,10 +31,12 @@ class PlexRepository {
   Future<String?> login({
     required String username,
     required String password,
+    String? code,
   }) async {
     final token = await api.login(
       username: username,
       password: password,
+      verificationCode: code,
     );
     if (token != null) {
       final SharedPreferences prefs = await sharedPreferences;
@@ -54,17 +56,17 @@ class PlexRepository {
       api.getLibraries(ip, port, token);
 
   Future<void> saveMedia({
-    required List<PlexLibrary> medias,
+    required List<PlexLibrary> libraries,
     String? lastSave,
   }) async {
     final SharedPreferences prefs = await sharedPreferences;
     String full = "";
-    for (var media in medias) {
+    for (var library in libraries) {
       if (full.isEmpty) {
-        final json = jsonEncode(media.items);
-        full = "${media.name},$json";
+        final json = jsonEncode(library.medias);
+        full = "${library.name},$json";
       } else {
-        full = "$full;${media.name},${jsonEncode(media.items)}";
+        full = "$full;${library.name},${jsonEncode(library.medias)}";
       }
     }
     if (lastSave != null) await prefs.setString(SavedValue.date.key, lastSave);
@@ -117,7 +119,7 @@ class PlexRepository {
             (entry) => PlexLibrary(
               name: entry.key,
               id: "",
-              items: entry.value,
+              medias: entry.value,
               status: PlexStatus.loaded,
             ),
           )

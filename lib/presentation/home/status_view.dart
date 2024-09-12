@@ -40,7 +40,7 @@ class StatusView extends StatelessWidget {
                       ),
                     ),
                     if (media.isLoading) Text("${media.count}/${media.total}"),
-                    if (media.isLoaded) Text("${media.items.length}")
+                    if (media.isLoaded) Text("${media.medias.length}")
                   ],
                 ),
               ),

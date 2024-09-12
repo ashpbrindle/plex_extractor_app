@@ -3,7 +3,7 @@ import 'package:plex_extractor_app/models/user_credentials.dart';
 import 'package:plex_extractor_app/viewmodels/plex_library.dart';
 
 class PlexState extends Equatable {
-  final List<PlexLibrary> media;
+  final List<PlexLibrary> libraries;
   final UserCredentials credentials;
   final String? error;
   final String? lastSaved;
@@ -11,7 +11,7 @@ class PlexState extends Equatable {
   final PlexLoginStatus plexLoginStatus;
 
   const PlexState({
-    required this.media,
+    required this.libraries,
     required this.lastSaved,
     required this.globalStatus,
     required this.plexLoginStatus,
@@ -20,7 +20,7 @@ class PlexState extends Equatable {
   });
   PlexState.init()
       : lastSaved = null,
-        media = [],
+        libraries = [],
         error = null,
         credentials = const UserCredentials(),
         plexLoginStatus = PlexLoginStatus.noAuthToken,
@@ -33,7 +33,7 @@ class PlexState extends Equatable {
           port: credentials.port,
           username: credentials.username,
         ),
-        media: media,
+        libraries: libraries,
         lastSaved: lastSaved,
         globalStatus: globalStatus,
         plexLoginStatus: PlexLoginStatus.noAuthToken,
@@ -58,7 +58,7 @@ class PlexState extends Equatable {
         username: username ?? credentials.username,
       ),
       error: error ?? this.error,
-      media: media ?? this.media,
+      libraries: media ?? this.libraries,
       globalStatus: globalStatus ?? this.globalStatus,
       lastSaved: lastSaved ?? this.lastSaved,
       plexLoginStatus: plexLoginStatus ?? this.plexLoginStatus,
@@ -67,7 +67,7 @@ class PlexState extends Equatable {
 
   @override
   List<Object?> get props => [
-        media,
+        libraries,
         credentials,
         lastSaved,
         plexLoginStatus,

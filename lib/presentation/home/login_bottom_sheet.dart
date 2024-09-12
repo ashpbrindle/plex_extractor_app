@@ -8,7 +8,11 @@ class LoginBottomSheet extends StatefulWidget {
     required this.savedUsername,
   });
 
-  final Future<bool> Function(String username, String password) login;
+  final Future<bool> Function(
+    String username,
+    String password, {
+    String? code,
+  }) login;
   final bool loading;
   final String? savedUsername;
 
@@ -19,6 +23,7 @@ class LoginBottomSheet extends StatefulWidget {
 class _LoginBottomSheetState extends State<LoginBottomSheet> {
   late TextEditingController username;
   late TextEditingController password;
+  late TextEditingController code;
 
   bool errorOccured = false;
   bool loading = false;
@@ -29,14 +34,17 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
     super.initState();
     username = TextEditingController(text: widget.savedUsername);
     password = TextEditingController();
+    code = TextEditingController();
     username.addListener(listener);
     password.addListener(listener);
+    code.addListener(listener);
   }
 
   @override
   void dispose() {
     username.removeListener(listener);
     password.removeListener(listener);
+    code.removeListener(listener);
     super.dispose();
   }
 
@@ -84,6 +92,12 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ),
             ],
           ),
+          TextField(
+            decoration: InputDecoration(labelText: 'Verification Code'),
+            autocorrect: false,
+            controller: code,
+            obscureText: false,
+          ),
           const SizedBox(height: 20),
           if (errorOccured) ...[
             const Text(
@@ -118,7 +132,13 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                               loading = true;
                               errorOccured = false;
                             });
-                            widget.login(username.text, password.text).then(
+                            widget
+                                .login(
+                                  username.text,
+                                  password.text,
+                                  code: code.text,
+                                )
+                                .then(
                                   (success) => success
                                       ? Navigator.pop(context)
                                       : setState(

@@ -17,6 +17,7 @@ class PlexApi {
   Future<String?> login({
     required String username,
     required String password,
+    String? verificationCode,
   }) async {
     const String productName = "PlexExtractorApp";
     const String productVersion = "1.0";
@@ -33,6 +34,8 @@ class PlexApi {
       'user': {
         'login': username,
         'password': password,
+        if (verificationCode != null && verificationCode.isNotEmpty)
+          'verification_code': verificationCode,
       },
     };
     final String jsonBody = jsonEncode(requestBody);

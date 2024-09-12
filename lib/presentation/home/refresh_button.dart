@@ -17,7 +17,7 @@ class RefreshButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool showConnect = state.media.isEmpty;
+    bool showConnect = state.libraries.isEmpty;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
