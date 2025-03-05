@@ -52,7 +52,7 @@ class LoginButton extends StatelessWidget {
             )
           : Text(
               token != null ? "Logout" : "Login",
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
     );
   }

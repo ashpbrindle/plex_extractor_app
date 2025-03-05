@@ -65,7 +65,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           TextField(
-            decoration: InputDecoration(labelText: 'Username'),
+            decoration: const InputDecoration(labelText: 'Username'),
             autocorrect: false,
             controller: username,
             obscureText: false,
@@ -74,7 +74,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             children: [
               Expanded(
                 child: TextField(
-                  decoration: InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(labelText: 'Password'),
                   autocorrect: false,
                   controller: password,
                   obscureText: !passwordVisible,
@@ -93,7 +93,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             ],
           ),
           TextField(
-            decoration: InputDecoration(labelText: 'Verification Code'),
+            decoration: const InputDecoration(labelText: 'Verification Code'),
             autocorrect: false,
             controller: code,
             obscureText: false,
@@ -156,6 +156,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                           width: 15,
                           height: 15,
                           child: CircularProgressIndicator(
+                            year2023: false,
                             color: Colors.white,
                             strokeWidth: 2,
                           ),

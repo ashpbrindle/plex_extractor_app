@@ -7,8 +7,6 @@ import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/viewmodels/plex_library.dart';
-import 'package:uuid/uuid.dart';
-import 'package:uuid/v4.dart';
 import 'package:xml/xml.dart';
 
 class PlexApi {

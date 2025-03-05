@@ -80,10 +80,11 @@ extension PlexStatusExtension on PlexLibrary {
             child: CircularProgressIndicator(
               strokeWidth: 2,
               color: colour,
+              year2023: false,
             ),
           ),
         PlexStatus.loaded => Icon(
-          color: Colors.purple,
+            color: Colors.purple,
             visible ? Icons.visibility : Icons.visibility_off,
           ),
         PlexStatus.error => Icon(

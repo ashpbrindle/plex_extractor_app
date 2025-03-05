@@ -43,7 +43,12 @@ class _HomeState extends State<Home> {
     return MaterialApp(
       navigatorKey: globalNavigatorKey,
       themeMode: ThemeMode.light,
-      theme: ThemeData(useMaterial3: true),
+      theme: ThemeData(
+        useMaterial3: true,
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          year2023: false,
+        ),
+      ),
       home: BlocBuilder<PlexCubit, PlexState>(builder: (context, state) {
         return Scaffold(
           floatingActionButton: FloatingActionButton.small(
@@ -126,7 +131,7 @@ class _HomeState extends State<Home> {
                       const SizedBox(height: 10),
                       Expanded(
                         child: RawScrollbar(
-                          thumbColor:  Color.fromARGB(255, 14, 25, 74),
+                          thumbColor:  const Color.fromARGB(255, 14, 25, 74),
                           controller: scrollController,
                           trackVisibility: true,
                           thumbVisibility: true,

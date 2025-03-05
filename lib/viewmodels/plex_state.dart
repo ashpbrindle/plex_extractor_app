@@ -58,7 +58,7 @@ class PlexState extends Equatable {
         username: username ?? credentials.username,
       ),
       error: error ?? this.error,
-      libraries: media ?? this.libraries,
+      libraries: media ?? libraries,
       globalStatus: globalStatus ?? this.globalStatus,
       lastSaved: lastSaved ?? this.lastSaved,
       plexLoginStatus: plexLoginStatus ?? this.plexLoginStatus,

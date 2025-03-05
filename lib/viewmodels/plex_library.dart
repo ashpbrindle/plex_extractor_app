@@ -34,7 +34,7 @@ class PlexLibrary extends Equatable {
       PlexLibrary(
         name: name ?? this.name,
         id: id ?? this.id,
-        medias: items ?? this.medias,
+        medias: items ?? medias,
         status: status ?? this.status,
         total: total ?? this.total,
         count: count ?? this.count,
