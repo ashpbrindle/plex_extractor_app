@@ -1,18 +1,26 @@
 import 'package:equatable/equatable.dart';
+import 'package:plex_extractor_app/models/artist.dart';
 import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
 class PlexLibrary extends Equatable {
-  List<Media> items;
+  final List<Media> medias;
   final String name;
   final String id;
   final PlexStatus status;
 
-  PlexLibrary({
+  final int total;
+  final int count;
+  final bool visible;
+
+  const PlexLibrary({
     required this.name,
     required this.id,
-    required this.items,
+    required this.medias,
     required this.status,
+    this.total = 0,
+    this.count = 0,
+    this.visible = true,
   });
 
   PlexLibrary copyWith({
@@ -20,14 +28,63 @@ class PlexLibrary extends Equatable {
     String? id,
     List<Media>? items,
     PlexStatus? status,
+    int? count,
+    int? total,
+    bool? visible,
   }) =>
       PlexLibrary(
         name: name ?? this.name,
         id: id ?? this.id,
-        items: items ?? this.items,
+        medias: items ?? medias,
         status: status ?? this.status,
+        total: total ?? this.total,
+        count: count ?? this.count,
+        visible: visible ?? this.visible,
       );
 
   @override
-  List<Object?> get props => [name, id, items, status];
+  List<Object?> get props => [
+        name,
+        id,
+        medias,
+        status,
+        total,
+        count,
+        visible,
+      ];
+}
+
+extension FilterLibraryExtension on List<PlexLibrary> {
+  List<PlexLibrary> filterByQuality(
+      bool show4k, bool show1080, bool showOther) {
+    List<PlexLibrary> filteredLibraries = map((library) {
+      return library.copyWith(
+        items: library.medias.filterByQuality(
+          show4k: show4k,
+          show1080: show1080,
+          showOther: showOther,
+        ),
+      );
+    }).toList();
+    return filteredLibraries
+        .where((library) => library.medias.isNotEmpty)
+        .toList();
+  }
+
+  List<PlexLibrary> filterByName(String search) => map((library) {
+        List<Media> filteredItems = library.medias.where((media) {
+          if (media is Artist) {
+            // For artists, check both artist name and album names
+            return media.name.toLowerCase().contains(search.toLowerCase()) ||
+                media.albums.any((album) => 
+                    album.toLowerCase().contains(search.toLowerCase()));
+          } else {
+            // For other media types, just check the name
+            return media.name.toLowerCase().contains(search.toLowerCase());
+          }
+        }).toList();
+        return library.copyWith(
+          items: filteredItems,
+        );
+      }).where((element) => element.medias.isNotEmpty).toList();
 }

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:isolate';
+import 'dart:ui';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:plex_extractor_app/api/plex/plex_repository.dart';
@@ -28,6 +30,57 @@ class PlexCubit extends Cubit<PlexState> {
         lastSaved: lastSave,
       ),
     );
+    listenToUpdates();
+  }
+
+  Future<void> showHideLibrary(String name) async {
+    List<PlexLibrary> libraries = [...state.libraries];
+    final updatedLibraries = libraries.map((library) {
+      if (library.name == name) {
+        return library.copyWith(visible: !library.visible);
+      } else {
+        return library;
+      }
+    }).toList();
+
+    emit(
+      state.copyWith(
+        media: updatedLibraries,
+      ),
+    );
+  }
+
+  Future<void> listenToUpdates() async {
+    final ReceivePort receivePort = ReceivePort();
+    IsolateNameServer.registerPortWithName(
+      receivePort.sendPort,
+      'libraryCountUpdate',
+    );
+
+    receivePort.listen((dynamic data) {
+      final parsedMessage = data.toString().split(',');
+      final libraryName = parsedMessage[0];
+      final total = int.parse(parsedMessage[1]);
+      final count = int.parse(parsedMessage[2]);
+      List<PlexLibrary> libraries = [...state.libraries];
+      final updatedLibraries = libraries.map((library) {
+        if (library.id == libraryName) {
+          print("${library.name}: $count/$total");
+          return library.copyWith(
+            total: total,
+            count: count,
+          );
+        } else {
+          return library;
+        }
+      }).toList();
+
+      emit(
+        state.copyWith(
+          media: updatedLibraries,
+        ),
+      );
+    });
   }
 
   /// Moves to a loading state and retrieves media from the provided ip and port
@@ -42,7 +95,7 @@ class PlexCubit extends Cubit<PlexState> {
       print("Attempting to Extract ${library.name}");
       lastSuccessfulDate = await _populateLibrary(ip, port, library: library);
       print(
-        "Extracted ${library.name} ${state.media.firstWhere(
+        "Extracted ${library.name} ${state.libraries.firstWhere(
           (element) => element.id == library.id,
         )}",
       );
@@ -50,7 +103,7 @@ class PlexCubit extends Cubit<PlexState> {
     if (lastSuccessfulDate != null) {
       if (state.credentials.authToken != null) {
         await _plexRepository.saveMedia(
-          medias: state.media,
+          libraries: state.libraries,
           lastSave: lastSuccessfulDate,
         );
         await _plexRepository.saveCredentials(
@@ -84,7 +137,7 @@ class PlexCubit extends Cubit<PlexState> {
     String port, {
     required PlexLibrary library,
   }) async {
-    List<PlexLibrary> newMedia = [...state.media];
+    List<PlexLibrary> newMedia = [...state.libraries];
     final index = newMedia.indexWhere((element) => element.id == library.id);
     try {
       if (state.credentials.authToken != null) {
@@ -122,18 +175,18 @@ class PlexCubit extends Cubit<PlexState> {
             PlexLibrary(
               name: name,
               id: id,
-              items: const [],
+              medias: const [],
               status: PlexStatus.loading,
             ),
           ),
         );
-        print("Found ${state.media.map((e) => e.name)}");
+        print("Found ${state.libraries.map((e) => e.name)}");
         emit(state.copyWith(media: [...plexLibraries]));
         return plexLibraries;
       }
       return [];
     } catch (e) {
-      List<PlexLibrary> newMedia = [...state.media];
+      List<PlexLibrary> newMedia = [...state.libraries];
       for (int i = 0; i < newMedia.length; i++) {
         newMedia[i] = newMedia[i].copyWith(status: PlexStatus.error);
       }
@@ -172,10 +225,17 @@ class PlexCubit extends Cubit<PlexState> {
     return token;
   }
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(
+    String username,
+    String password, {
+    String? code,
+  }) async {
     emit(state.copyWith(plexLoginStatus: PlexLoginStatus.loading));
-    String? token =
-        await _plexRepository.login(username: username, password: password);
+    String? token = await _plexRepository.login(
+      username: username,
+      password: password,
+      code: code,
+    );
     if (token != null) {
       emit(
         state.copyWith(
@@ -205,7 +265,7 @@ class PlexCubit extends Cubit<PlexState> {
 
   void _plexLoadingStatus(String ip, String port) {
     List<PlexLibrary> library = [];
-    for (var element in state.media) {
+    for (var element in state.libraries) {
       library.add(element.copyWith(status: PlexStatus.loading));
     }
     emit(

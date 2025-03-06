@@ -3,12 +3,11 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
+import 'package:plex_extractor_app/models/artist.dart';
 import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
 import 'package:plex_extractor_app/viewmodels/plex_library.dart';
-import 'package:uuid/uuid.dart';
-import 'package:uuid/v4.dart';
 import 'package:xml/xml.dart';
 
 class PlexApi {
@@ -17,6 +16,7 @@ class PlexApi {
   Future<String?> login({
     required String username,
     required String password,
+    String? verificationCode,
   }) async {
     const String productName = "PlexExtractorApp";
     const String productVersion = "1.0";
@@ -33,6 +33,8 @@ class PlexApi {
       'user': {
         'login': username,
         'password': password,
+        if (verificationCode != null && verificationCode.isNotEmpty)
+          'verification_code': verificationCode,
       },
     };
     final String jsonBody = jsonEncode(requestBody);
@@ -93,18 +95,11 @@ class PlexApi {
         return await getMovies(library.id, ip, port, plexToken);
       case "show":
         return await getTvShows(library.id, ip, port, plexToken);
+      case "artist":
+        return await getArtists(library.id, ip, port, plexToken);
     }
     return [];
   }
-
-  // Future<Map<String, List<Media>>> getEverything(
-  //     Map<String, String> libraries, String ipAddress, String port) async {
-  //   Map<String, List<Media>> media = {};
-  //   for (final library in libraries.entries) {
-  //     getMedia(library, ipAddress, port);
-  //   }
-  //   return media;
-  // }
 
   Future<String?> _extractType(
       String key, String ip, String port, String plexToken) async {
@@ -124,6 +119,63 @@ class PlexApi {
     return viewGroup;
   }
 
+  Future<List<Media>> getArtists(
+      String libraryId, String ipAddress, String port, String plexToken) async {
+    final url = Uri.parse(
+      'http://$ipAddress:$port/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
+    );
+    final response = await http.get(url);
+    final document = XmlDocument.parse(response.body);
+    final artists = document
+        .findAllElements('Directory')
+        .where((element) => element.getAttribute('type') == 'artist')
+        .toList();
+
+    List<Media> result = [];
+    for (var artist in artists) {
+      final ratingKey = artist.getAttribute('ratingKey') ?? '';
+      final albums =
+          await _getArtistAlbums(ratingKey, ipAddress, port, plexToken);
+
+      result.add(Artist(
+        name: artist.getAttribute('title') ?? '',
+        type: 'artist',
+        year: '', // Artists don't have years in Plex
+        albums: albums,
+      ));
+    }
+    return result;
+  }
+
+  Future<List<String>> _getArtistAlbums(
+      String ratingKey, String ipAddress, String port, String plexToken) async {
+    final url = Uri.parse(
+      'http://$ipAddress:$port/library/metadata/$ratingKey/allLeaves?X-Plex-Token=$plexToken',
+    );
+    final response = await http.get(url);
+    final document = XmlDocument.parse(response.body);
+
+    final mediaContainer = document.findAllElements('MediaContainer');
+    if (mediaContainer.isEmpty) {
+      return [];
+    }
+
+    final size =
+        int.tryParse(mediaContainer.first.getAttribute('size') ?? '0') ?? 0;
+    if (size == 0) {
+      return [];
+    }
+
+    final tracks = document.findAllElements('Track');
+    final albumNames = tracks
+        .map((track) => track.getAttribute('parentTitle') ?? '')
+        .where((title) => title.isNotEmpty)
+        .toSet()
+        .toList();
+
+    return albumNames;
+  }
+
   Future<List<Movie>> getMovies(
       String libraryId, String ipAddress, String port, String plexToken) async {
     // http://[IP address]:32400/library/sections/[Movies Library ID]/all?X-Plex-Token=[PlexToken]&[Filter]
@@ -133,8 +185,10 @@ class PlexApi {
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
-    final videos = document.findAllElements('Video');
-    for (var video in videos) {
+    final videos = document.findAllElements('Video').toList();
+    for (int i = 0; i < videos.length; i++) {
+      final video = videos[i];
+      updateStatus(libraryName: libraryId, total: videos.length, count: i + 1);
       final media = video.findAllElements('Media');
       var title = video.attributes
           .firstWhere((p0) => p0.name.local.contains("title"))
@@ -143,12 +197,6 @@ class PlexApi {
           .firstWhereOrNull(
               (element) => element.name.local.contains("videoResolution"))
           ?.value;
-      // final width = media.first.attributes
-      //     .firstWhereOrNull((element) => element.name.local.contains("width"))
-      //     ?.value;
-      // final height = media.first.attributes
-      //     .firstWhereOrNull((element) => element.name.local.contains("height"))
-      //     ?.value;
       var year = video.attributes
           .firstWhere((p0) => p0.name.local.contains("year"))
           .value;
@@ -173,16 +221,19 @@ class PlexApi {
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
-    final directories = document.findAllElements('Directory');
-    for (var directory in directories) {
+    final directories = document.findAllElements('Directory').toList();
+    for (int i = 0; i < directories.length; i++) {
+      final directory = directories[i];
+      updateStatus(
+          libraryName: libraryId, total: directories.length, count: i + 1);
       final ratingKey = directory.attributes
           .firstWhere(
-            (attribute) => attribute.name.toString().contains("ratingKey"),
+            (attribute) => attribute.name.local.contains("ratingKey"),
           )
           .value;
       final title = directory.attributes
           .firstWhere(
-            (attribute) => attribute.name.toString().contains("title"),
+            (attribute) => attribute.name.local.contains("title"),
           )
           .value;
       var year = directory.attributes
@@ -214,12 +265,12 @@ class PlexApi {
       try {
         final name = directory.attributes
             .firstWhere(
-              (attribute) => attribute.name.toString().contains("title"),
+              (attribute) => attribute.name.local.contains("title"),
             )
             .value;
         final ratingKey = directory.attributes
             .firstWhere(
-              (attribute) => attribute.name.toString().contains("ratingKey"),
+              (attribute) => attribute.name.local.contains("ratingKey"),
             )
             .value;
         seasons.add(
@@ -265,7 +316,12 @@ class PlexApi {
     return episodes;
   }
 
-  void updateStatus(String text) {
-    IsolateNameServer.lookupPortByName("messages")?.send(text);
+  void updateStatus({
+    required String libraryName,
+    required int total,
+    required int count,
+  }) {
+    IsolateNameServer.lookupPortByName("libraryCountUpdate")
+        ?.send("$libraryName,$total,$count");
   }
 }

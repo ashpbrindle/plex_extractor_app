@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:plex_extractor_app/api/plex/plex_api.dart';
+import 'package:plex_extractor_app/models/artist.dart';
 import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
@@ -31,10 +32,12 @@ class PlexRepository {
   Future<String?> login({
     required String username,
     required String password,
+    String? code,
   }) async {
     final token = await api.login(
       username: username,
       password: password,
+      verificationCode: code,
     );
     if (token != null) {
       final SharedPreferences prefs = await sharedPreferences;
@@ -54,17 +57,17 @@ class PlexRepository {
       api.getLibraries(ip, port, token);
 
   Future<void> saveMedia({
-    required List<PlexLibrary> medias,
+    required List<PlexLibrary> libraries,
     String? lastSave,
   }) async {
     final SharedPreferences prefs = await sharedPreferences;
     String full = "";
-    for (var media in medias) {
+    for (var library in libraries) {
       if (full.isEmpty) {
-        final json = jsonEncode(media.items);
-        full = "${media.name},$json";
+        final json = jsonEncode(library.medias);
+        full = "${library.name},$json";
       } else {
-        full = "$full;${media.name},${jsonEncode(media.items)}";
+        full = "$full;${library.name},${jsonEncode(library.medias)}";
       }
     }
     if (lastSave != null) await prefs.setString(SavedValue.date.key, lastSave);
@@ -91,6 +94,7 @@ class PlexRepository {
       for (final media in medias) {
         List<Movie> extractedMovies = [];
         List<TvShow> extractedTv = [];
+        List<Artist> extractedArtists = [];
         final temp = media.split(",");
         final name = temp.first;
         final listOfMedias = temp.sublist(1).join(",");
@@ -106,6 +110,12 @@ class PlexRepository {
             extractedTv.add(TvShow.fromJson(show));
           }
           extractedMedia.putIfAbsent(name, () => extractedTv);
+        } else if (listOfMedias.contains('"type":"artist"')) {
+          final artists = jsonDecode(listOfMedias);
+          for (var artist in artists) {
+            extractedArtists.add(Artist.fromJson(artist));
+          }
+          extractedMedia.putIfAbsent(name, () => extractedArtists);
         } else {
           extractedMedia.putIfAbsent(name, () => []);
         }
@@ -117,7 +127,7 @@ class PlexRepository {
             (entry) => PlexLibrary(
               name: entry.key,
               id: "",
-              items: entry.value,
+              medias: entry.value,
               status: PlexStatus.loaded,
             ),
           )

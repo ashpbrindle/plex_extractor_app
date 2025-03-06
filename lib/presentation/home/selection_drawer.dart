@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:plex_extractor_app/presentation/home/login_bottom_sheet.dart';
 import 'package:plex_extractor_app/presentation/home/login_button.dart';
 import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
 import 'package:plex_extractor_app/presentation/home/status_view.dart';
@@ -17,6 +16,7 @@ class SelectionDrawer extends StatelessWidget {
         return Drawer(
           backgroundColor: const Color.fromARGB(255, 178, 193, 201),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
                 color: const Color.fromARGB(255, 14, 25, 74),
@@ -30,47 +30,75 @@ class SelectionDrawer extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      LoginButton(
-                        token: state.credentials.authToken,
-                        loginStatus: state.plexLoginStatus,
-                        savedUsername: state.credentials.username,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.blueGrey,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 5,
-                            horizontal: 20,
+                      if (state.lastSaved != null) ...[
+                        const Text(
+                          "Last Successful Full Sync:",
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
-                          child: Center(
-                            child: Text(
-                              state.lastSaved != null
-                                  ? "${state.lastSaved}"
-                                  : "N/A",
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w300),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: Colors.blueGrey,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 5,
+                              horizontal: 20,
+                            ),
+                            child: Center(
+                              child: state.globalStatus == PlexStatus.loading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                        
+                                      ),
+                                    )
+                                  : Text(
+                                      "${state.lastSaved}",
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w300),
+                                    ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
               ),
-              ...state.media
-                  .map(
-                    (e) => StatusView(
-                      media: e,
-                    ),
-                  )
-                  .toList()
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ...state.libraries
+                          .map(
+                            (e) => StatusView(
+                              media: e,
+                              complete: state.globalStatus != PlexStatus.loading,
+                            ),
+                          )
+                          .toList()
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: LoginButton(
+                  token: state.credentials.authToken,
+                  loginStatus: state.plexLoginStatus,
+                  savedUsername: state.credentials.username,
+                ),
+              ),
             ],
           ),
         );
