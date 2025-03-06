@@ -119,38 +119,61 @@ class PlexApi {
     return viewGroup;
   }
 
-  Future<List<Artist>> getArtists(
+  Future<List<Media>> getArtists(
       String libraryId, String ipAddress, String port, String plexToken) async {
-    List<Artist> artists = [];
     final url = Uri.parse(
       'http://$ipAddress:$port/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
     );
     final response = await http.get(url);
     final document = XmlDocument.parse(response.body);
-    final videos = document.findAllElements('artist').toList();
-    for (int i = 0; i < videos.length; i++) {
-      final video = videos[i];
-      updateStatus(libraryName: libraryId, total: videos.length, count: i + 1);
-      final media = video.findAllElements('Media');
-      var title = video.attributes
-          .firstWhere((p0) => p0.name.local.contains("title"))
-          .value;
-      final resolution = media.first.attributes
-          .firstWhereOrNull(
-              (element) => element.name.local.contains("videoResolution"))
-          ?.value;
-      var year = video.attributes
-          .firstWhere((p0) => p0.name.local.contains("year"))
-          .value;
-      artists.add(
-        Artist(
-          name: title,
-          year: year,
-          type: "artist",
-        ),
-      );
+    final artists = document
+        .findAllElements('Directory')
+        .where((element) => element.getAttribute('type') == 'artist')
+        .toList();
+
+    List<Media> result = [];
+    for (var artist in artists) {
+      final ratingKey = artist.getAttribute('ratingKey') ?? '';
+      final albums =
+          await _getArtistAlbums(ratingKey, ipAddress, port, plexToken);
+
+      result.add(Artist(
+        name: artist.getAttribute('title') ?? '',
+        type: 'artist',
+        year: '', // Artists don't have years in Plex
+        albums: albums,
+      ));
     }
-    return artists;
+    return result;
+  }
+
+  Future<List<String>> _getArtistAlbums(
+      String ratingKey, String ipAddress, String port, String plexToken) async {
+    final url = Uri.parse(
+      'http://$ipAddress:$port/library/metadata/$ratingKey/allLeaves?X-Plex-Token=$plexToken',
+    );
+    final response = await http.get(url);
+    final document = XmlDocument.parse(response.body);
+
+    final mediaContainer = document.findAllElements('MediaContainer');
+    if (mediaContainer.isEmpty) {
+      return [];
+    }
+
+    final size =
+        int.tryParse(mediaContainer.first.getAttribute('size') ?? '0') ?? 0;
+    if (size == 0) {
+      return [];
+    }
+
+    final tracks = document.findAllElements('Track');
+    final albumNames = tracks
+        .map((track) => track.getAttribute('parentTitle') ?? '')
+        .where((title) => title.isNotEmpty)
+        .toSet()
+        .toList();
+
+    return albumNames;
   }
 
   Future<List<Movie>> getMovies(
