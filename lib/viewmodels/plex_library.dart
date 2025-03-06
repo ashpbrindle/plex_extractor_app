@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:plex_extractor_app/models/artist.dart';
 import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
@@ -71,10 +72,17 @@ extension FilterLibraryExtension on List<PlexLibrary> {
   }
 
   List<PlexLibrary> filterByName(String search) => map((library) {
-        List<Media> filteredItems = library.medias
-            .where((movie) =>
-                movie.name.toLowerCase().contains(search.toLowerCase()))
-            .toList();
+        List<Media> filteredItems = library.medias.where((media) {
+          if (media is Artist) {
+            // For artists, check both artist name and album names
+            return media.name.toLowerCase().contains(search.toLowerCase()) ||
+                media.albums.any((album) => 
+                    album.toLowerCase().contains(search.toLowerCase()));
+          } else {
+            // For other media types, just check the name
+            return media.name.toLowerCase().contains(search.toLowerCase());
+          }
+        }).toList();
         return library.copyWith(
           items: filteredItems,
         );
