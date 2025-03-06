@@ -24,7 +24,7 @@ class _PlexConnectState extends State<PlexConnect> {
     super.initState();
     SharedPreferences.getInstance().then((prefs) {
       final recentIp = prefs.getString(SavedValue.ip.key);
-      final recentPort = prefs.getString(SavedValue.port.key);
+      final recentPort = prefs.getInt(SavedValue.port.key);
       controller.addListener(() {
         setState(() {});
       });
@@ -32,7 +32,7 @@ class _PlexConnectState extends State<PlexConnect> {
         setState(() {});
       });
       if (recentIp != null) controller.text = recentIp;
-      if (recentPort != null) portController.text = recentPort;
+      if (recentPort != null) portController.text = recentPort.toString();
     });
   }
 

@@ -80,7 +80,7 @@ extension PlexStatusExtension on PlexLibrary {
             child: CircularProgressIndicator(
               strokeWidth: 2,
               color: colour,
-              year2023: false,
+              
             ),
           ),
         PlexStatus.loaded => Icon(

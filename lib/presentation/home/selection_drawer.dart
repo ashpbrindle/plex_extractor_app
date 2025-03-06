@@ -58,7 +58,7 @@ class SelectionDrawer extends StatelessWidget {
                                       child: CircularProgressIndicator(
                                         color: Colors.white,
                                         strokeWidth: 2,
-                                        year2023: false,
+                                        
                                       ),
                                     )
                                   : Text(

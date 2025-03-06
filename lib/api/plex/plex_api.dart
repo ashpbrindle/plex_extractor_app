@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
+import 'package:plex_extractor_app/models/artist.dart';
 import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
@@ -94,6 +95,8 @@ class PlexApi {
         return await getMovies(library.id, ip, port, plexToken);
       case "show":
         return await getTvShows(library.id, ip, port, plexToken);
+      case "artist":
+        return await getArtists(library.id, ip, port, plexToken);
     }
     return [];
   }
@@ -114,6 +117,40 @@ class PlexApi {
       break;
     }
     return viewGroup;
+  }
+
+  Future<List<Artist>> getArtists(
+      String libraryId, String ipAddress, String port, String plexToken) async {
+    List<Artist> artists = [];
+    final url = Uri.parse(
+      'http://$ipAddress:$port/library/sections/$libraryId/all?X-Plex-Token=$plexToken&',
+    );
+    final response = await http.get(url);
+    final document = XmlDocument.parse(response.body);
+    final videos = document.findAllElements('artist').toList();
+    for (int i = 0; i < videos.length; i++) {
+      final video = videos[i];
+      updateStatus(libraryName: libraryId, total: videos.length, count: i + 1);
+      final media = video.findAllElements('Media');
+      var title = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("title"))
+          .value;
+      final resolution = media.first.attributes
+          .firstWhereOrNull(
+              (element) => element.name.local.contains("videoResolution"))
+          ?.value;
+      var year = video.attributes
+          .firstWhere((p0) => p0.name.local.contains("year"))
+          .value;
+      artists.add(
+        Artist(
+          name: title,
+          year: year,
+          type: "artist",
+        ),
+      );
+    }
+    return artists;
   }
 
   Future<List<Movie>> getMovies(
