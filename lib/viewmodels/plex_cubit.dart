@@ -33,6 +33,10 @@ class PlexCubit extends Cubit<PlexState> {
     listenToUpdates();
   }
 
+  update4k(bool value) => emit(state.copyWith(show4k: value));
+  updateOther(bool value) => emit(state.copyWith(showOther: value));
+  update1080(bool value) => emit(state.copyWith(show1080: value));
+
   Future<void> showHideLibrary(String name) async {
     List<PlexLibrary> libraries = [...state.libraries];
     final updatedLibraries = libraries.map((library) {

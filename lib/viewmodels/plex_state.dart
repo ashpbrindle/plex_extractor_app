@@ -10,6 +10,10 @@ class PlexState extends Equatable {
   final PlexStatus globalStatus;
   final PlexLoginStatus plexLoginStatus;
 
+  final bool show4k;
+  final bool showOther;
+  final bool show1080;
+
   const PlexState({
     required this.libraries,
     required this.lastSaved,
@@ -17,6 +21,9 @@ class PlexState extends Equatable {
     required this.plexLoginStatus,
     required this.credentials,
     this.error,
+    this.show4k = true,
+    this.showOther = true,
+    this.show1080 = true,
   });
   PlexState.init()
       : lastSaved = null,
@@ -24,7 +31,10 @@ class PlexState extends Equatable {
         error = null,
         credentials = const UserCredentials(),
         plexLoginStatus = PlexLoginStatus.noAuthToken,
-        globalStatus = PlexStatus.init;
+        globalStatus = PlexStatus.init,
+        show4k = true,
+        showOther = true,
+        show1080 = true;
 
   PlexState resetToken() => PlexState(
         credentials: UserCredentials(
@@ -49,6 +59,9 @@ class PlexState extends Equatable {
     String? lastSaved,
     PlexStatus? globalStatus,
     PlexLoginStatus? plexLoginStatus,
+    bool? show4k,
+    bool? showOther,
+    bool? show1080,
   }) {
     return PlexState(
       credentials: UserCredentials(
@@ -62,6 +75,9 @@ class PlexState extends Equatable {
       globalStatus: globalStatus ?? this.globalStatus,
       lastSaved: lastSaved ?? this.lastSaved,
       plexLoginStatus: plexLoginStatus ?? this.plexLoginStatus,
+      show4k: show4k ?? this.show4k,
+      showOther: showOther ?? this.showOther,
+      show1080: show1080 ?? this.show1080,
     );
   }
 
@@ -72,6 +88,9 @@ class PlexState extends Equatable {
         lastSaved,
         plexLoginStatus,
         error,
+        show4k,
+        showOther,
+        show1080,
       ];
 }
 

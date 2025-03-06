@@ -22,27 +22,23 @@ class StatusView extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: () => context.read<PlexCubit>().showHideLibrary(media.name),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 10),
             child: Center(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    media.statusWidget,
-                    const SizedBox(
-                      width: 5,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  media.statusWidget,
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                    child: Text(
+                      media.name,
                     ),
-                    Expanded(
-                      child: Text(
-                        media.name,
-                      ),
-                    ),
-                    if (media.isLoading) Text("${media.count}/${media.total}"),
-                    if (media.isLoaded) Text("${media.medias.length}")
-                  ],
-                ),
+                  ),
+                  if (media.isLoading) Text("${media.count}/${media.total}"),
+                  if (media.isLoaded) Text("${media.medias.length}")
+                ],
               ),
             ),
           ),
@@ -80,7 +76,6 @@ extension PlexStatusExtension on PlexLibrary {
             child: CircularProgressIndicator(
               strokeWidth: 2,
               color: colour,
-              
             ),
           ),
         PlexStatus.loaded => Icon(

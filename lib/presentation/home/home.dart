@@ -21,9 +21,6 @@ class _HomeState extends State<Home> {
   final TextEditingController searchController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   bool isAboveHalfWay = true;
-  bool show4k = true;
-  bool show1080 = true;
-  bool showOther = true;
 
   @override
   void initState() {
@@ -45,8 +42,7 @@ class _HomeState extends State<Home> {
       themeMode: ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
-        progressIndicatorTheme: const ProgressIndicatorThemeData(
-        ),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(),
       ),
       home: BlocBuilder<PlexCubit, PlexState>(builder: (context, state) {
         return Scaffold(
@@ -62,59 +58,9 @@ class _HomeState extends State<Home> {
           appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color.fromARGB(255, 178, 193, 201),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                if (state.libraries.isNotEmpty)
-                  Row(
-                    children: [
-                      const Text(
-                        "4K",
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      Switch(
-                        value: show4k,
-                        onChanged: (value) {
-                          setState(() {
-                            show4k = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                Row(
-                  children: [
-                    const Text(
-                      "1080p",
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    Switch(
-                      value: show1080,
-                      onChanged: (value) {
-                        setState(() {
-                          show1080 = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      "Other",
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    Switch(
-                      value: showOther,
-                      onChanged: (value) {
-                        setState(() {
-                          showOther = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+            title: TextInput(
+              controller: searchController,
+              hintText: "Search...",
             ),
           ),
           drawer: const SelectionDrawer(),
@@ -123,14 +69,10 @@ class _HomeState extends State<Home> {
             child: state.libraries.isNotEmpty
                 ? Column(
                     children: [
-                      TextInput(
-                        controller: searchController,
-                        hintText: "Search...",
-                      ),
                       const SizedBox(height: 10),
                       Expanded(
                         child: RawScrollbar(
-                          thumbColor:  const Color.fromARGB(255, 14, 25, 74),
+                          thumbColor: const Color.fromARGB(255, 14, 25, 74),
                           controller: scrollController,
                           trackVisibility: true,
                           thumbVisibility: true,
@@ -140,7 +82,8 @@ class _HomeState extends State<Home> {
                             slivers: [
                               ...state.libraries
                                   .filterByName(searchController.text)
-                                  .filterByQuality(show4k, show1080, showOther)
+                                  .filterByQuality(state.show4k, state.show1080,
+                                      state.showOther)
                                   .map(
                                     (e) => e.visible
                                         ? LibrarySectionWidget(library: e)

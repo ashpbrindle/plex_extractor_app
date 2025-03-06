@@ -8,7 +8,6 @@ import 'package:plex_extractor_app/viewmodels/plex_state.dart';
 
 class SelectionDrawer extends StatelessWidget {
   const SelectionDrawer({super.key});
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PlexCubit, PlexState>(
@@ -40,35 +39,26 @@ class SelectionDrawer extends StatelessWidget {
                         const SizedBox(
                           height: 5,
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: Colors.blueGrey,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal: 20,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 5,
-                              horizontal: 20,
-                            ),
-                            child: Center(
-                              child: state.globalStatus == PlexStatus.loading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                        
-                                      ),
-                                    )
-                                  : Text(
-                                      "${state.lastSaved}",
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w300),
-                                    ),
-                            ),
-                          ),
+                          child: state.globalStatus == PlexStatus.loading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  "${state.lastSaved}",
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w300),
+                                ),
                         ),
                       ],
                     ],
@@ -83,10 +73,59 @@ class SelectionDrawer extends StatelessWidget {
                           .map(
                             (e) => StatusView(
                               media: e,
-                              complete: state.globalStatus != PlexStatus.loading,
+                              complete:
+                                  state.globalStatus != PlexStatus.loading,
                             ),
                           )
                           .toList()
+                    ],
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => context.read<PlexCubit>().update4k(!state.show4k),
+                child: Padding(
+                  padding: const EdgeInsets.all(13.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        state.show4k ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.purple,
+                      ),
+                      const SizedBox(width: 5),
+                      const Expanded(child: Text("Show 4K")),
+                    ],
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => context.read<PlexCubit>().update1080(!state.show1080),
+                child: Padding(
+                  padding: const EdgeInsets.all(13.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        state.show1080 ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.purple,
+                      ),
+                      const SizedBox(width: 5),
+                      const Expanded(child: Text("Show 1080p")),
+                    ],
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => context.read<PlexCubit>().updateOther(!state.showOther),
+                child: Padding(
+                  padding: const EdgeInsets.all(13.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        state.showOther ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.purple,
+                      ),
+                      const SizedBox(width: 5),
+                      const Expanded(child: Text("Show Other")),
                     ],
                   ),
                 ),

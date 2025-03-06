@@ -27,7 +27,17 @@ class TextInput extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: hintText,
                     contentPadding: const EdgeInsets.all(10.0),
-                    border: InputBorder.none,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: Colors.grey.shade600),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: Colors.grey.shade700),
+                    ),
                   ),
                 ),
               ),
