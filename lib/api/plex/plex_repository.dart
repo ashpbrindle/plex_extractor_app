@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:plex_extractor_app/api/plex/plex_api.dart';
+import 'package:plex_extractor_app/models/artist.dart';
 import 'package:plex_extractor_app/models/media.dart';
 import 'package:plex_extractor_app/models/movie.dart';
 import 'package:plex_extractor_app/models/tv_show.dart';
@@ -93,6 +94,7 @@ class PlexRepository {
       for (final media in medias) {
         List<Movie> extractedMovies = [];
         List<TvShow> extractedTv = [];
+        List<Artist> extractedArtists = [];
         final temp = media.split(",");
         final name = temp.first;
         final listOfMedias = temp.sublist(1).join(",");
@@ -108,6 +110,12 @@ class PlexRepository {
             extractedTv.add(TvShow.fromJson(show));
           }
           extractedMedia.putIfAbsent(name, () => extractedTv);
+        } else if (listOfMedias.contains('"type":"artist"')) {
+          final artists = jsonDecode(listOfMedias);
+          for (var artist in artists) {
+            extractedArtists.add(Artist.fromJson(artist));
+          }
+          extractedMedia.putIfAbsent(name, () => extractedArtists);
         } else {
           extractedMedia.putIfAbsent(name, () => []);
         }
