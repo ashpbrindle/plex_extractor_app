@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:plex_extractor_app/models/user_credentials.dart';
-import 'package:plex_extractor_app/viewmodels/plex_library.dart';
+import 'package:plextractor/models/user_credentials.dart';
+import 'package:plextractor/viewmodels/plex_library.dart';
 
 class PlexState extends Equatable {
   final List<PlexLibrary> libraries;

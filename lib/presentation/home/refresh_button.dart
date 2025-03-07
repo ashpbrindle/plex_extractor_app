@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/viewmodels/plex_cubit.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 
 class RefreshButton extends StatelessWidget {
   const RefreshButton(

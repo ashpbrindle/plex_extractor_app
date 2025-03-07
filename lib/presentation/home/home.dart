@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:plex_extractor_app/presentation/home/library_section_widget.dart';
-import 'package:plex_extractor_app/presentation/home/selection_drawer.dart';
-import 'package:plex_extractor_app/presentation/home/text_input.dart';
-import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
-import 'package:plex_extractor_app/viewmodels/plex_library.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/presentation/home/library_section_widget.dart';
+import 'package:plextractor/presentation/home/selection_drawer.dart';
+import 'package:plextractor/presentation/home/text_input.dart';
+import 'package:plextractor/viewmodels/plex_cubit.dart';
+import 'package:plextractor/viewmodels/plex_library.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 
 class Home extends StatefulWidget {
   const Home({

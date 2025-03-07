@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:plex_extractor_app/models/artist.dart';
-import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/models/artist.dart';
+import 'package:plextractor/models/media.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 
 class PlexLibrary extends Equatable {
   final List<Media> medias;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:plex_extractor_app/models/artist.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
-import 'package:plex_extractor_app/presentation/artist/artist_row_item.dart';
-import 'package:plex_extractor_app/presentation/movie/media_row_item.dart';
-import 'package:plex_extractor_app/presentation/tv/tv_row_item.dart';
-import 'package:plex_extractor_app/viewmodels/plex_library.dart';
+import 'package:plextractor/models/artist.dart';
+import 'package:plextractor/models/tv_show.dart';
+import 'package:plextractor/presentation/artist/artist_row_item.dart';
+import 'package:plextractor/presentation/movie/media_row_item.dart';
+import 'package:plextractor/presentation/tv/tv_row_item.dart';
+import 'package:plextractor/viewmodels/plex_library.dart';
 
 class LibrarySectionWidget extends StatelessWidget {
   const LibrarySectionWidget({

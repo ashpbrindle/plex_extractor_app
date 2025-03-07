@@ -3,10 +3,10 @@
 // import 'dart:convert';
 
 // import 'package:dio/dio.dart';
-// import 'package:plex_extractor_app/models/movie.dart';
-// import 'package:plex_extractor_app/models/tv_show.dart';
-// import 'package:plex_extractor_app/models/tvdb/tvdb_movie.dart';
-// import 'package:plex_extractor_app/models/tvdb/tvdb_tv_show.dart';
+// import 'package:plextractor/models/movie.dart';
+// import 'package:plextractor/models/tv_show.dart';
+// import 'package:plextractor/models/tvdb/tvdb_movie.dart';
+// import 'package:plextractor/models/tvdb/tvdb_tv_show.dart';
 // part 'tvdb_api.dart';
 
 // class TvdbRepository {

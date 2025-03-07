@@ -1,4 +1,4 @@
-import 'package:plex_extractor_app/models/media.dart';
+import 'package:plextractor/models/media.dart';
 
 class Movie extends Media {
   String? resolution;

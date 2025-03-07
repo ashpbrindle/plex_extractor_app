@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/models/movie.dart';
-import 'package:plex_extractor_app/style.dart';
+import 'package:plextractor/models/media.dart';
+import 'package:plextractor/models/movie.dart';
+import 'package:plextractor/style.dart';
 
 class MediaRowItem extends StatelessWidget {
   const MediaRowItem({

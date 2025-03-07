@@ -1,5 +1,5 @@
-// import 'package:plex_extractor_app/models/movie.dart';
-// import 'package:plex_extractor_app/models/tv_show.dart';
+// import 'package:plextractor/models/movie.dart';
+// import 'package:plextractor/models/tv_show.dart';
 
 // List<Movie> sampleMovies = [
 //   Movie(name: "Elemental", year: "2023", tvdb: "337156"),

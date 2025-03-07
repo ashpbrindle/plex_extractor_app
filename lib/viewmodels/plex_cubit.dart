@@ -3,9 +3,9 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:plex_extractor_app/api/plex/plex_repository.dart';
-import 'package:plex_extractor_app/viewmodels/plex_library.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/api/plex/plex_repository.dart';
+import 'package:plextractor/viewmodels/plex_library.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 
 class PlexCubit extends Cubit<PlexState> {
   PlexCubit({

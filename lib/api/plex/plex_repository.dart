@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:plex_extractor_app/api/plex/plex_api.dart';
-import 'package:plex_extractor_app/models/artist.dart';
-import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/models/movie.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
-import 'package:plex_extractor_app/viewmodels/plex_library.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/api/plex/plex_api.dart';
+import 'package:plextractor/models/artist.dart';
+import 'package:plextractor/models/media.dart';
+import 'package:plextractor/models/movie.dart';
+import 'package:plextractor/models/tv_show.dart';
+import 'package:plextractor/viewmodels/plex_library.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlexRepository {

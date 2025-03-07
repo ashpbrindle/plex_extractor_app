@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:plex_extractor_app/presentation/home/login_button.dart';
-import 'package:plex_extractor_app/presentation/home/plex_connect.dart';
-import 'package:plex_extractor_app/presentation/home/status_view.dart';
-import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/presentation/home/login_button.dart';
+import 'package:plextractor/presentation/home/plex_connect.dart';
+import 'package:plextractor/presentation/home/status_view.dart';
+import 'package:plextractor/viewmodels/plex_cubit.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 
 class SelectionDrawer extends StatelessWidget {
   const SelectionDrawer({super.key});

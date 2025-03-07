@@ -1,6 +1,6 @@
 library tv_show;
 
-import 'package:plex_extractor_app/models/media.dart';
+import 'package:plextractor/models/media.dart';
 
 part 'tv_show_season.dart';
 part 'tv_show_episode.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
-import 'package:plex_extractor_app/presentation/tv/tv_row_item.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/models/tv_show.dart';
+import 'package:plextractor/presentation/tv/tv_row_item.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 
 class TvView extends StatelessWidget {
   const TvView({

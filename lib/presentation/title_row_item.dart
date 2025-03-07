@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:plex_extractor_app/style.dart';
+import 'package:plextractor/style.dart';
 
 class TitleRowItem extends StatelessWidget {
   const TitleRowItem({

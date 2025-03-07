@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:plex_extractor_app/api/plex/plex_repository.dart';
-import 'package:plex_extractor_app/presentation/home/refresh_button.dart';
-import 'package:plex_extractor_app/viewmodels/plex_cubit.dart';
-import 'package:plex_extractor_app/viewmodels/plex_state.dart';
+import 'package:plextractor/api/plex/plex_repository.dart';
+import 'package:plextractor/presentation/home/refresh_button.dart';
+import 'package:plextractor/viewmodels/plex_cubit.dart';
+import 'package:plextractor/viewmodels/plex_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlexConnect extends StatefulWidget {

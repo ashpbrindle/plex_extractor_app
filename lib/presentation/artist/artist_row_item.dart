@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:plex_extractor_app/models/artist.dart';
-import 'package:plex_extractor_app/style.dart';
+import 'package:plextractor/models/artist.dart';
+import 'package:plextractor/style.dart';
 
 class ArtistRowItem extends StatelessWidget {
   const ArtistRowItem({

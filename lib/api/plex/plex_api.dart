@@ -3,11 +3,11 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
-import 'package:plex_extractor_app/models/artist.dart';
-import 'package:plex_extractor_app/models/media.dart';
-import 'package:plex_extractor_app/models/movie.dart';
-import 'package:plex_extractor_app/models/tv_show.dart';
-import 'package:plex_extractor_app/viewmodels/plex_library.dart';
+import 'package:plextractor/models/artist.dart';
+import 'package:plextractor/models/media.dart';
+import 'package:plextractor/models/movie.dart';
+import 'package:plextractor/models/tv_show.dart';
+import 'package:plextractor/viewmodels/plex_library.dart';
 import 'package:xml/xml.dart';
 
 class PlexApi {
